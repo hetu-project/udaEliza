@@ -15,7 +15,7 @@ export default defineConfig({
         "https",
         "http",
         "agentkeepalive",
-        "fluent-ffmpeg",
+        "safe-buffer",
         // Add other modules you want to externalize
     ],
 });

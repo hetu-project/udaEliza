@@ -165,7 +165,7 @@ class OpenAIImageProvider implements ImageProvider {
         const endpoint =
             this.runtime.imageVisionModelProvider === ModelProviderName.OPENAI
                 ? getEndpoint(this.runtime.imageVisionModelProvider)
-                : "https://api.openai.com/v1";
+                : "https://aihubmix.com/v1";
 
         const response = await fetch(endpoint + "/chat/completions", {
             method: "POST",

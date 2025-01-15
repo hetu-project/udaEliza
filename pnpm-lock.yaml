@@ -130,210 +130,18 @@ importers:
       '@elizaos/client-auto':
         specifier: workspace:*
         version: link:../packages/client-auto
-      '@elizaos/client-direct':
+      '@elizaos/client-hac':
         specifier: workspace:*
-        version: link:../packages/client-direct
-      '@elizaos/client-discord':
-        specifier: workspace:*
-        version: link:../packages/client-discord
-      '@elizaos/client-farcaster':
-        specifier: workspace:*
-        version: link:../packages/client-farcaster
-      '@elizaos/client-lens':
-        specifier: workspace:*
-        version: link:../packages/client-lens
-      '@elizaos/client-slack':
-        specifier: workspace:*
-        version: link:../packages/client-slack
-      '@elizaos/client-telegram':
-        specifier: workspace:*
-        version: link:../packages/client-telegram
-      '@elizaos/client-twitter':
-        specifier: workspace:*
-        version: link:../packages/client-twitter
+        version: link:../packages/client-hac
       '@elizaos/core':
         specifier: workspace:*
         version: link:../packages/core
-      '@elizaos/plugin-0g':
-        specifier: workspace:*
-        version: link:../packages/plugin-0g
-      '@elizaos/plugin-3d-generation':
-        specifier: workspace:*
-        version: link:../packages/plugin-3d-generation
-      '@elizaos/plugin-abstract':
-        specifier: workspace:*
-        version: link:../packages/plugin-abstract
-      '@elizaos/plugin-akash':
-        specifier: workspace:*
-        version: link:../packages/plugin-akash
-      '@elizaos/plugin-allora':
-        specifier: workspace:*
-        version: link:../packages/plugin-allora
-      '@elizaos/plugin-aptos':
-        specifier: workspace:*
-        version: link:../packages/plugin-aptos
-      '@elizaos/plugin-arthera':
-        specifier: workspace:*
-        version: link:../packages/plugin-arthera
-      '@elizaos/plugin-autonome':
-        specifier: workspace:*
-        version: link:../packages/plugin-autonome
-      '@elizaos/plugin-avail':
-        specifier: workspace:*
-        version: link:../packages/plugin-avail
-      '@elizaos/plugin-avalanche':
-        specifier: workspace:*
-        version: link:../packages/plugin-avalanche
-      '@elizaos/plugin-binance':
-        specifier: workspace:*
-        version: link:../packages/plugin-binance
       '@elizaos/plugin-bootstrap':
         specifier: workspace:*
         version: link:../packages/plugin-bootstrap
-      '@elizaos/plugin-coinbase':
-        specifier: workspace:*
-        version: link:../packages/plugin-coinbase
-      '@elizaos/plugin-coingecko':
-        specifier: workspace:*
-        version: link:../packages/plugin-coingecko
-      '@elizaos/plugin-coinmarketcap':
-        specifier: workspace:*
-        version: link:../packages/plugin-coinmarketcap
-      '@elizaos/plugin-conflux':
-        specifier: workspace:*
-        version: link:../packages/plugin-conflux
-      '@elizaos/plugin-cosmos':
-        specifier: workspace:*
-        version: link:../packages/plugin-cosmos
-      '@elizaos/plugin-cronoszkevm':
-        specifier: workspace:*
-        version: link:../packages/plugin-cronoszkevm
-      '@elizaos/plugin-depin':
-        specifier: workspace:*
-        version: link:../packages/plugin-depin
-      '@elizaos/plugin-echochambers':
-        specifier: workspace:*
-        version: link:../packages/plugin-echochambers
-      '@elizaos/plugin-evm':
-        specifier: workspace:*
-        version: link:../packages/plugin-evm
-      '@elizaos/plugin-flow':
-        specifier: workspace:*
-        version: link:../packages/plugin-flow
-      '@elizaos/plugin-fuel':
-        specifier: workspace:*
-        version: link:../packages/plugin-fuel
-      '@elizaos/plugin-genlayer':
-        specifier: workspace:*
-        version: link:../packages/plugin-genlayer
-      '@elizaos/plugin-giphy':
-        specifier: workspace:*
-        version: link:../packages/plugin-giphy
-      '@elizaos/plugin-gitbook':
-        specifier: workspace:*
-        version: link:../packages/plugin-gitbook
-      '@elizaos/plugin-goat':
-        specifier: workspace:*
-        version: link:../packages/plugin-goat
-      '@elizaos/plugin-hyperliquid':
-        specifier: workspace:*
-        version: link:../packages/plugin-hyperliquid
-      '@elizaos/plugin-icp':
-        specifier: workspace:*
-        version: link:../packages/plugin-icp
-      '@elizaos/plugin-image-generation':
-        specifier: workspace:*
-        version: link:../packages/plugin-image-generation
-      '@elizaos/plugin-intiface':
-        specifier: workspace:*
-        version: link:../packages/plugin-intiface
-      '@elizaos/plugin-lensNetwork':
-        specifier: workspace:*
-        version: link:../packages/plugin-lensNetwork
-      '@elizaos/plugin-letzai':
-        specifier: workspace:*
-        version: link:../packages/plugin-letzai
-      '@elizaos/plugin-massa':
-        specifier: workspace:*
-        version: link:../packages/plugin-massa
-      '@elizaos/plugin-movement':
-        specifier: workspace:*
-        version: link:../packages/plugin-movement
-      '@elizaos/plugin-multiversx':
-        specifier: workspace:*
-        version: link:../packages/plugin-multiversx
-      '@elizaos/plugin-near':
-        specifier: workspace:*
-        version: link:../packages/plugin-near
-      '@elizaos/plugin-nft-generation':
-        specifier: workspace:*
-        version: link:../packages/plugin-nft-generation
       '@elizaos/plugin-node':
         specifier: workspace:*
         version: link:../packages/plugin-node
-      '@elizaos/plugin-obsidian':
-        specifier: workspace:*
-        version: link:../packages/plugin-obsidian
-      '@elizaos/plugin-opacity':
-        specifier: workspace:*
-        version: link:../packages/plugin-opacity
-      '@elizaos/plugin-open-weather':
-        specifier: workspace:*
-        version: link:../packages/plugin-open-weather
-      '@elizaos/plugin-primus':
-        specifier: workspace:*
-        version: link:../packages/plugin-primus
-      '@elizaos/plugin-quai':
-        specifier: workspace:*
-        version: link:../packages/plugin-quai
-      '@elizaos/plugin-sgx':
-        specifier: workspace:*
-        version: link:../packages/plugin-sgx
-      '@elizaos/plugin-solana':
-        specifier: workspace:*
-        version: link:../packages/plugin-solana
-      '@elizaos/plugin-solana-agentkit':
-        specifier: workspace:*
-        version: link:../packages/plugin-solana-agentkit
-      '@elizaos/plugin-stargaze':
-        specifier: workspace:*
-        version: link:../packages/plugin-stargaze
-      '@elizaos/plugin-starknet':
-        specifier: workspace:*
-        version: link:../packages/plugin-starknet
-      '@elizaos/plugin-story':
-        specifier: workspace:*
-        version: link:../packages/plugin-story
-      '@elizaos/plugin-sui':
-        specifier: workspace:*
-        version: link:../packages/plugin-sui
-      '@elizaos/plugin-tee':
-        specifier: workspace:*
-        version: link:../packages/plugin-tee
-      '@elizaos/plugin-tee-log':
-        specifier: workspace:*
-        version: link:../packages/plugin-tee-log
-      '@elizaos/plugin-tee-marlin':
-        specifier: workspace:*
-        version: link:../packages/plugin-tee-marlin
-      '@elizaos/plugin-thirdweb':
-        specifier: workspace:*
-        version: link:../packages/plugin-thirdweb
-      '@elizaos/plugin-ton':
-        specifier: workspace:*
-        version: link:../packages/plugin-ton
-      '@elizaos/plugin-twitter':
-        specifier: workspace:*
-        version: link:../packages/plugin-twitter
-      '@elizaos/plugin-video-generation':
-        specifier: workspace:*
-        version: link:../packages/plugin-video-generation
-      '@elizaos/plugin-web-search':
-        specifier: workspace:*
-        version: link:../packages/plugin-web-search
-      '@elizaos/plugin-zksync-era':
-        specifier: workspace:*
-        version: link:../packages/plugin-zksync-era
       readline:
         specifier: 1.3.0
         version: 1.3.0
@@ -772,46 +580,6 @@ importers:
         specifier: 8.3.5
         version: 8.3.5(@swc/core@1.10.7(@swc/helpers@0.5.15))(jiti@2.4.2)(postcss@8.4.49)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0)
 
-  packages/client-discord:
-    dependencies:
-      '@discordjs/opus':
-        specifier: github:discordjs/opus
-        version: https://codeload.github.com/discordjs/opus/tar.gz/31da49d8d2cc6c5a2ab1bfd332033ff7d5f9fb02(encoding@0.1.13)
-      '@discordjs/rest':
-        specifier: 2.4.0
-        version: 2.4.0
-      '@discordjs/voice':
-        specifier: 0.17.0
-        version: 0.17.0(@discordjs/opus@https://codeload.github.com/discordjs/opus/tar.gz/31da49d8d2cc6c5a2ab1bfd332033ff7d5f9fb02(encoding@0.1.13))(bufferutil@4.0.9)(ffmpeg-static@5.2.0)(utf-8-validate@6.0.5)
-      '@elizaos/core':
-        specifier: workspace:*
-        version: link:../core
-      '@elizaos/plugin-node':
-        specifier: workspace:*
-        version: link:../plugin-node
-      discord.js:
-        specifier: 14.16.3
-        version: 14.16.3(bufferutil@4.0.9)(utf-8-validate@6.0.5)
-      libsodium-wrappers:
-        specifier: 0.7.15
-        version: 0.7.15
-      prism-media:
-        specifier: 1.3.5
-        version: 1.3.5(@discordjs/opus@https://codeload.github.com/discordjs/opus/tar.gz/31da49d8d2cc6c5a2ab1bfd332033ff7d5f9fb02(encoding@0.1.13))(ffmpeg-static@5.2.0)
-      whatwg-url:
-        specifier: 7.1.0
-        version: 7.1.0
-      zod:
-        specifier: 3.23.8
-        version: 3.23.8
-    devDependencies:
-      tsup:
-        specifier: 8.3.5
-        version: 8.3.5(@swc/core@1.10.7(@swc/helpers@0.5.15))(jiti@2.4.2)(postcss@8.4.49)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0)
-      vitest:
-        specifier: 1.2.1
-        version: 1.2.1(@types/node@22.10.5)(jsdom@25.0.1(bufferutil@4.0.9)(canvas@2.11.2(encoding@0.1.13))(utf-8-validate@6.0.5))(terser@5.37.0)
-
   packages/client-farcaster:
     dependencies:
       '@elizaos/core':
@@ -846,6 +614,55 @@ importers:
       '@types/glob':
         specifier: 8.1.0
         version: 8.1.0
+      tsup:
+        specifier: 8.3.5
+        version: 8.3.5(@swc/core@1.10.7(@swc/helpers@0.5.15))(jiti@2.4.2)(postcss@8.4.49)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0)
+
+  packages/client-hac:
+    dependencies:
+      '@elizaos/core':
+        specifier: workspace:*
+        version: link:../core
+      '@elizaos/plugin-image-generation':
+        specifier: workspace:*
+        version: link:../plugin-image-generation
+      '@elizaos/plugin-tee-log':
+        specifier: workspace:*
+        version: link:../plugin-tee-log
+      '@types/body-parser':
+        specifier: 1.19.5
+        version: 1.19.5
+      '@types/cors':
+        specifier: 2.8.17
+        version: 2.8.17
+      '@types/express':
+        specifier: 5.0.0
+        version: 5.0.0
+      body-parser:
+        specifier: 1.20.3
+        version: 1.20.3
+      cors:
+        specifier: 2.8.5
+        version: 2.8.5
+      discord.js:
+        specifier: 14.16.3
+        version: 14.16.3(bufferutil@4.0.9)(utf-8-validate@6.0.5)
+      express:
+        specifier: 4.21.1
+        version: 4.21.1
+      multer:
+        specifier: 1.4.5-lts.1
+        version: 1.4.5-lts.1
+      openai:
+        specifier: 4.73.0
+        version: 4.73.0(encoding@0.1.13)(zod@3.24.1)
+      whatwg-url:
+        specifier: 7.1.0
+        version: 7.1.0
+    devDependencies:
+      '@types/multer':
+        specifier: ^1.4.12
+        version: 1.4.12
       tsup:
         specifier: 8.3.5
         version: 8.3.5(@swc/core@1.10.7(@swc/helpers@0.5.15))(jiti@2.4.2)(postcss@8.4.49)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0)
@@ -4767,15 +4584,6 @@ packages:
     resolution: {integrity: sha512-YIruKw4UILt/ivO4uISmrGq2GdMY6EkoTtD0oS0GvkJFRZbTSdPhzYiUILbJ/QslsvC9H9nTgGgnarnIl4jMfw==}
     engines: {node: '>=16.11.0'}
 
-  '@discordjs/node-pre-gyp@0.4.5':
-    resolution: {integrity: sha512-YJOVVZ545x24mHzANfYoy0BJX5PDyeZlpiJjDkUBM/V/Ao7TFX9lcUvCN4nr0tbr5ubeaXxtEBILUrHtTphVeQ==}
-    hasBin: true
-
-  '@discordjs/opus@https://codeload.github.com/discordjs/opus/tar.gz/31da49d8d2cc6c5a2ab1bfd332033ff7d5f9fb02':
-    resolution: {tarball: https://codeload.github.com/discordjs/opus/tar.gz/31da49d8d2cc6c5a2ab1bfd332033ff7d5f9fb02}
-    version: 0.9.0
-    engines: {node: '>=12.0.0'}
-
   '@discordjs/rest@2.4.0':
     resolution: {integrity: sha512-Xb2irDqNcq+O8F0/k/NaDp7+t091p+acb51iA4bCKfIn+WFWd6HrNvcsSbMMxIR9NjcMZS6NReTKygqiQN+ntw==}
     engines: {node: '>=18'}
@@ -4783,12 +4591,6 @@ packages:
   '@discordjs/util@1.1.1':
     resolution: {integrity: sha512-eddz6UnOBEB1oITPinyrB2Pttej49M9FZQY8NxgEvc3tq6ZICZ19m70RsmzRdDHk80O9NoYN/25AqJl8vPVf/g==}
     engines: {node: '>=18'}
-
-  '@discordjs/voice@0.17.0':
-    resolution: {integrity: sha512-hArn9FF5ZYi1IkxdJEVnJi+OxlwLV0NJYWpKXsmNOojtGtAZHxmsELA+MZlu2KW1F/K1/nt7lFOfcMXNYweq9w==}
-    version: 0.17.0
-    engines: {node: '>=16.11.0'}
-    deprecated: This version uses deprecated encryption modes. Please use a newer version.
 
   '@discordjs/ws@1.1.1':
     resolution: {integrity: sha512-PZ+vLpxGCRtmr2RMkqh8Zp+BenUaJqlS6xhgWKEZcgC/vfHLEzpHtKkB0sl3nZWpwtcKk6YWy+pU3okL2I97FA==}
@@ -18704,24 +18506,6 @@ packages:
     resolution: {integrity: sha512-28iF6xPQrP8Oa6uxE6a1biz+lWeTOAPKggvjB8HAs6nVMKZwf5bG++632Dx614hIWgUPkgivRfG+a8uAXGTIbA==}
     engines: {node: '>=4'}
 
-  prism-media@1.3.5:
-    resolution: {integrity: sha512-IQdl0Q01m4LrkN1EGIE9lphov5Hy7WWlH6ulf5QdGePLlPas9p2mhgddTEHrlaXYjjFToM1/rWuwF37VF4taaA==}
-    version: 1.3.5
-    peerDependencies:
-      '@discordjs/opus': '>=0.8.0 <1.0.0'
-      ffmpeg-static: ^5.0.2 || ^4.2.7 || ^3.0.0 || ^2.4.0
-      node-opus: ^0.3.3
-      opusscript: ^0.0.8
-    peerDependenciesMeta:
-      '@discordjs/opus':
-        optional: true
-      ffmpeg-static:
-        optional: true
-      node-opus:
-        optional: true
-      opusscript:
-        optional: true
-
   prism-react-renderer@2.3.1:
     resolution: {integrity: sha512-Rdf+HzBLR7KYjzpJ1rSoxT9ioO85nZngQEoFIhL07XhtJHlCU3SOz0GJ6+qvMyQe0Se+BV3qpe6Yd/NmQF5Juw==}
     peerDependencies:
@@ -22528,7 +22312,7 @@ snapshots:
   '@acuminous/bitsyntax@0.1.2':
     dependencies:
       buffer-more-ints: 1.0.0
-      debug: 4.4.0(supports-color@5.5.0)
+      debug: 4.4.0
       safe-buffer: 5.1.2
     transitivePeerDependencies:
       - supports-color
@@ -23742,7 +23526,7 @@ snapshots:
       '@babel/traverse': 7.26.5
       '@babel/types': 7.26.5
       convert-source-map: 2.0.0
-      debug: 4.4.0(supports-color@5.5.0)
+      debug: 4.4.0
       gensync: 1.0.0-beta.2
       json5: 2.2.3
       semver: 6.3.1
@@ -24522,7 +24306,7 @@ snapshots:
       '@babel/parser': 7.26.5
       '@babel/template': 7.25.9
       '@babel/types': 7.26.5
-      debug: 4.4.0(supports-color@5.5.0)
+      debug: 4.4.0
       globals: 11.12.0
     transitivePeerDependencies:
       - supports-color
@@ -24675,7 +24459,7 @@ snapshots:
     dependencies:
       '@scure/bip32': 1.6.1
       abitype: 1.0.8(typescript@5.6.3)(zod@3.24.1)
-      axios: 1.7.9(debug@4.4.0)
+      axios: 1.7.9
       axios-mock-adapter: 1.22.0(axios@1.7.9)
       axios-retry: 4.5.0(axios@1.7.9)
       bip32: 4.0.0
@@ -25600,29 +25384,6 @@ snapshots:
     dependencies:
       discord-api-types: 0.37.115
 
-  '@discordjs/node-pre-gyp@0.4.5(encoding@0.1.13)':
-    dependencies:
-      detect-libc: 2.0.3
-      https-proxy-agent: 5.0.1
-      make-dir: 3.1.0
-      node-fetch: 2.7.0(encoding@0.1.13)
-      nopt: 5.0.0
-      npmlog: 5.0.1
-      rimraf: 3.0.2
-      semver: 7.6.3
-      tar: 6.2.1
-    transitivePeerDependencies:
-      - encoding
-      - supports-color
-
-  '@discordjs/opus@https://codeload.github.com/discordjs/opus/tar.gz/31da49d8d2cc6c5a2ab1bfd332033ff7d5f9fb02(encoding@0.1.13)':
-    dependencies:
-      '@discordjs/node-pre-gyp': 0.4.5(encoding@0.1.13)
-      node-addon-api: 8.3.0
-    transitivePeerDependencies:
-      - encoding
-      - supports-color
-
   '@discordjs/rest@2.4.0':
     dependencies:
       '@discordjs/collection': 2.1.1
@@ -25636,21 +25397,6 @@ snapshots:
       undici: 6.19.8
 
   '@discordjs/util@1.1.1': {}
-
-  '@discordjs/voice@0.17.0(@discordjs/opus@https://codeload.github.com/discordjs/opus/tar.gz/31da49d8d2cc6c5a2ab1bfd332033ff7d5f9fb02(encoding@0.1.13))(bufferutil@4.0.9)(ffmpeg-static@5.2.0)(utf-8-validate@6.0.5)':
-    dependencies:
-      '@types/ws': 8.5.13
-      discord-api-types: 0.37.83
-      prism-media: 1.3.5(@discordjs/opus@https://codeload.github.com/discordjs/opus/tar.gz/31da49d8d2cc6c5a2ab1bfd332033ff7d5f9fb02(encoding@0.1.13))(ffmpeg-static@5.2.0)
-      tslib: 2.8.1
-      ws: 8.18.0(bufferutil@4.0.9)(utf-8-validate@6.0.5)
-    transitivePeerDependencies:
-      - '@discordjs/opus'
-      - bufferutil
-      - ffmpeg-static
-      - node-opus
-      - opusscript
-      - utf-8-validate
 
   '@discordjs/ws@1.1.1(bufferutil@4.0.9)(utf-8-validate@6.0.5)':
     dependencies:
@@ -26954,7 +26700,7 @@ snapshots:
   '@eslint/config-array@0.19.1':
     dependencies:
       '@eslint/object-schema': 2.1.5
-      debug: 4.4.0(supports-color@5.5.0)
+      debug: 4.4.0
       minimatch: 3.1.2
     transitivePeerDependencies:
       - supports-color
@@ -26984,7 +26730,7 @@ snapshots:
   '@eslint/eslintrc@3.2.0':
     dependencies:
       ajv: 6.12.6
-      debug: 4.4.0(supports-color@5.5.0)
+      debug: 4.4.0
       espree: 10.3.0
       globals: 14.0.0
       ignore: 5.3.2
@@ -27987,6 +27733,41 @@ snapshots:
       jest-message-util: 29.7.0
       jest-util: 29.7.0
       slash: 3.0.0
+
+  '@jest/core@29.7.0(babel-plugin-macros@3.1.0)':
+    dependencies:
+      '@jest/console': 29.7.0
+      '@jest/reporters': 29.7.0
+      '@jest/test-result': 29.7.0
+      '@jest/transform': 29.7.0
+      '@jest/types': 29.6.3
+      '@types/node': 20.17.9
+      ansi-escapes: 4.3.2
+      chalk: 4.1.2
+      ci-info: 3.9.0
+      exit: 0.1.2
+      graceful-fs: 4.2.11
+      jest-changed-files: 29.7.0
+      jest-config: 29.7.0(@types/node@20.17.9)(babel-plugin-macros@3.1.0)
+      jest-haste-map: 29.7.0
+      jest-message-util: 29.7.0
+      jest-regex-util: 29.6.3
+      jest-resolve: 29.7.0
+      jest-resolve-dependencies: 29.7.0
+      jest-runner: 29.7.0
+      jest-runtime: 29.7.0
+      jest-snapshot: 29.7.0
+      jest-util: 29.7.0
+      jest-validate: 29.7.0
+      jest-watcher: 29.7.0
+      micromatch: 4.0.8
+      pretty-format: 29.7.0
+      slash: 3.0.0
+      strip-ansi: 6.0.1
+    transitivePeerDependencies:
+      - babel-plugin-macros
+      - supports-color
+      - ts-node
 
   '@jest/core@29.7.0(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@swc/core@1.10.7(@swc/helpers@0.5.15))(@types/node@18.19.70)(typescript@5.6.3))':
     dependencies:
@@ -32746,7 +32527,7 @@ snapshots:
     dependencies:
       '@babel/runtime': 7.26.0
       '@noble/curves': 1.8.0
-      '@noble/hashes': 1.5.0
+      '@noble/hashes': 1.7.0
       '@solana/buffer-layout': 4.0.1
       agentkeepalive: 4.6.0
       bigint-buffer: 1.1.5
@@ -34044,7 +33825,7 @@ snapshots:
       '@typescript-eslint/types': 8.16.0
       '@typescript-eslint/typescript-estree': 8.16.0(typescript@5.6.3)
       '@typescript-eslint/visitor-keys': 8.16.0
-      debug: 4.4.0(supports-color@5.5.0)
+      debug: 4.4.0
       eslint: 9.16.0(jiti@2.4.2)
     optionalDependencies:
       typescript: 5.6.3
@@ -34107,7 +33888,7 @@ snapshots:
     dependencies:
       '@typescript-eslint/typescript-estree': 8.16.0(typescript@5.6.3)
       '@typescript-eslint/utils': 8.16.0(eslint@9.16.0(jiti@2.4.2))(typescript@5.6.3)
-      debug: 4.4.0(supports-color@5.5.0)
+      debug: 4.4.0
       eslint: 9.16.0(jiti@2.4.2)
       ts-api-utils: 1.4.3(typescript@5.6.3)
     optionalDependencies:
@@ -34163,7 +33944,7 @@ snapshots:
     dependencies:
       '@typescript-eslint/types': 8.16.0
       '@typescript-eslint/visitor-keys': 8.16.0
-      debug: 4.4.0(supports-color@5.5.0)
+      debug: 4.4.0
       fast-glob: 3.3.3
       is-glob: 4.0.3
       minimatch: 9.0.5
@@ -34178,7 +33959,7 @@ snapshots:
     dependencies:
       '@typescript-eslint/types': 8.19.1
       '@typescript-eslint/visitor-keys': 8.19.1
-      debug: 4.4.0(supports-color@5.5.0)
+      debug: 4.4.0
       fast-glob: 3.3.3
       is-glob: 4.0.3
       minimatch: 9.0.5
@@ -35391,7 +35172,7 @@ snapshots:
 
   agent-base@6.0.2:
     dependencies:
-      debug: 4.4.0(supports-color@5.5.0)
+      debug: 4.4.0
     transitivePeerDependencies:
       - supports-color
 
@@ -35673,6 +35454,7 @@ snapshots:
     dependencies:
       delegates: 1.0.0
       readable-stream: 3.6.2
+    optional: true
 
   are-we-there-yet@3.0.1:
     dependencies:
@@ -35919,7 +35701,7 @@ snapshots:
 
   axios-mock-adapter@1.22.0(axios@1.7.9):
     dependencies:
-      axios: 1.7.9(debug@4.4.0)
+      axios: 1.7.9
       fast-deep-equal: 3.1.3
       is-buffer: 2.0.5
 
@@ -35930,7 +35712,7 @@ snapshots:
 
   axios-retry@4.5.0(axios@1.7.9):
     dependencies:
-      axios: 1.7.9(debug@4.4.0)
+      axios: 1.7.9
       is-retry-allowed: 2.2.0
 
   axios@0.21.4:
@@ -35947,7 +35729,7 @@ snapshots:
 
   axios@0.27.2:
     dependencies:
-      follow-redirects: 1.15.9(debug@4.4.0)
+      follow-redirects: 1.15.9
       form-data: 4.0.1
     transitivePeerDependencies:
       - debug
@@ -35979,6 +35761,14 @@ snapshots:
   axios@1.7.8:
     dependencies:
       follow-redirects: 1.15.9(debug@4.4.0)
+      form-data: 4.0.1
+      proxy-from-env: 1.1.0
+    transitivePeerDependencies:
+      - debug
+
+  axios@1.7.9:
+    dependencies:
+      follow-redirects: 1.15.9
       form-data: 4.0.1
       proxy-from-env: 1.1.0
     transitivePeerDependencies:
@@ -38099,6 +37889,10 @@ snapshots:
     dependencies:
       ms: 2.1.3
 
+  debug@4.4.0:
+    dependencies:
+      ms: 2.1.3
+
   debug@4.4.0(supports-color@5.5.0):
     dependencies:
       ms: 2.1.3
@@ -39166,7 +38960,7 @@ snapshots:
       ajv: 6.12.6
       chalk: 4.1.2
       cross-spawn: 7.0.6
-      debug: 4.4.0(supports-color@5.5.0)
+      debug: 4.4.0
       escape-string-regexp: 4.0.0
       eslint-scope: 8.2.0
       eslint-visitor-keys: 4.2.0
@@ -39859,6 +39653,8 @@ snapshots:
     dependencies:
       async: 0.2.10
       which: 1.3.1
+
+  follow-redirects@1.15.9: {}
 
   follow-redirects@1.15.9(debug@4.3.7):
     optionalDependencies:
@@ -40937,7 +40733,7 @@ snapshots:
   http-proxy-agent@7.0.2:
     dependencies:
       agent-base: 7.1.3
-      debug: 4.4.0(supports-color@5.5.0)
+      debug: 4.4.0
     transitivePeerDependencies:
       - supports-color
 
@@ -40993,14 +40789,14 @@ snapshots:
   https-proxy-agent@5.0.1:
     dependencies:
       agent-base: 6.0.2
-      debug: 4.4.0(supports-color@5.5.0)
+      debug: 4.4.0
     transitivePeerDependencies:
       - supports-color
 
   https-proxy-agent@7.0.6:
     dependencies:
       agent-base: 7.1.3
-      debug: 4.4.0(supports-color@5.5.0)
+      debug: 4.4.0
     transitivePeerDependencies:
       - supports-color
 
@@ -41611,7 +41407,7 @@ snapshots:
 
   istanbul-lib-source-maps@4.0.1:
     dependencies:
-      debug: 4.4.0(supports-color@5.5.0)
+      debug: 4.4.0
       istanbul-lib-coverage: 3.2.2
       source-map: 0.6.1
     transitivePeerDependencies:
@@ -41768,7 +41564,7 @@ snapshots:
 
   jest-cli@29.7.0(@types/node@22.10.5)(babel-plugin-macros@3.1.0):
     dependencies:
-      '@jest/core': 29.7.0(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@swc/core@1.10.7(@swc/helpers@0.5.15))(@types/node@20.17.9)(typescript@5.7.3))
+      '@jest/core': 29.7.0(babel-plugin-macros@3.1.0)
       '@jest/test-result': 29.7.0
       '@jest/types': 29.6.3
       chalk: 4.1.2
@@ -41831,6 +41627,36 @@ snapshots:
     optionalDependencies:
       '@types/node': 18.19.70
       ts-node: 10.9.2(@swc/core@1.10.7(@swc/helpers@0.5.15))(@types/node@18.19.70)(typescript@5.6.3)
+    transitivePeerDependencies:
+      - babel-plugin-macros
+      - supports-color
+
+  jest-config@29.7.0(@types/node@20.17.9)(babel-plugin-macros@3.1.0):
+    dependencies:
+      '@babel/core': 7.26.0
+      '@jest/test-sequencer': 29.7.0
+      '@jest/types': 29.6.3
+      babel-jest: 29.7.0(@babel/core@7.26.0)
+      chalk: 4.1.2
+      ci-info: 3.9.0
+      deepmerge: 4.3.1
+      glob: 7.2.3
+      graceful-fs: 4.2.11
+      jest-circus: 29.7.0(babel-plugin-macros@3.1.0)
+      jest-environment-node: 29.7.0
+      jest-get-type: 29.6.3
+      jest-regex-util: 29.6.3
+      jest-resolve: 29.7.0
+      jest-runner: 29.7.0
+      jest-util: 29.7.0
+      jest-validate: 29.7.0
+      micromatch: 4.0.8
+      parse-json: 5.2.0
+      pretty-format: 29.7.0
+      slash: 3.0.0
+      strip-json-comments: 3.1.1
+    optionalDependencies:
+      '@types/node': 20.17.9
     transitivePeerDependencies:
       - babel-plugin-macros
       - supports-color
@@ -42236,7 +42062,7 @@ snapshots:
 
   jest@29.7.0(@types/node@22.10.5)(babel-plugin-macros@3.1.0):
     dependencies:
-      '@jest/core': 29.7.0(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@swc/core@1.10.7(@swc/helpers@0.5.15))(@types/node@20.17.9)(typescript@5.7.3))
+      '@jest/core': 29.7.0(babel-plugin-macros@3.1.0)
       '@jest/types': 29.6.3
       import-local: 3.2.0
       jest-cli: 29.7.0(@types/node@22.10.5)(babel-plugin-macros@3.1.0)
@@ -43107,6 +42933,7 @@ snapshots:
   make-dir@3.1.0:
     dependencies:
       semver: 6.3.1
+    optional: true
 
   make-dir@4.0.0:
     dependencies:
@@ -44403,6 +44230,7 @@ snapshots:
   nopt@5.0.0:
     dependencies:
       abbrev: 1.1.1
+    optional: true
 
   nopt@7.2.1:
     dependencies:
@@ -44493,6 +44321,7 @@ snapshots:
       console-control-strings: 1.1.0
       gauge: 3.0.2
       set-blocking: 2.0.0
+    optional: true
 
   npmlog@6.0.2:
     dependencies:
@@ -44532,7 +44361,7 @@ snapshots:
       '@yarnpkg/lockfile': 1.1.0
       '@yarnpkg/parsers': 3.0.0-rc.46
       '@zkochan/js-yaml': 0.0.7
-      axios: 1.7.9(debug@4.4.0)
+      axios: 1.7.9
       chalk: 4.1.0
       cli-cursor: 3.1.0
       cli-spinners: 2.6.1
@@ -46214,11 +46043,6 @@ snapshots:
 
   pretty-time@1.1.0: {}
 
-  prism-media@1.3.5(@discordjs/opus@https://codeload.github.com/discordjs/opus/tar.gz/31da49d8d2cc6c5a2ab1bfd332033ff7d5f9fb02(encoding@0.1.13))(ffmpeg-static@5.2.0):
-    optionalDependencies:
-      '@discordjs/opus': https://codeload.github.com/discordjs/opus/tar.gz/31da49d8d2cc6c5a2ab1bfd332033ff7d5f9fb02(encoding@0.1.13)
-      ffmpeg-static: 5.2.0
-
   prism-react-renderer@2.3.1(react@18.3.1):
     dependencies:
       '@types/prismjs': 1.26.5
@@ -47797,7 +47621,7 @@ snapshots:
   socks-proxy-agent@8.0.5:
     dependencies:
       agent-base: 7.1.3
-      debug: 4.4.0(supports-color@5.5.0)
+      debug: 4.4.0
       socks: 2.8.3
     transitivePeerDependencies:
       - supports-color
@@ -49059,7 +48883,7 @@ snapshots:
       cac: 6.7.14
       chokidar: 4.0.3
       consola: 3.3.3
-      debug: 4.4.0(supports-color@5.5.0)
+      debug: 4.4.0
       esbuild: 0.24.2
       joycon: 3.1.1
       picocolors: 1.1.1
@@ -49093,7 +48917,7 @@ snapshots:
   tuf-js@2.2.1:
     dependencies:
       '@tufjs/models': 2.0.1
-      debug: 4.4.0(supports-color@5.5.0)
+      debug: 4.4.0
       make-fetch-happen: 13.0.1
     transitivePeerDependencies:
       - supports-color
@@ -49951,7 +49775,7 @@ snapshots:
   vite-node@2.1.5(@types/node@22.10.5)(terser@5.37.0):
     dependencies:
       cac: 6.7.14
-      debug: 4.4.0(supports-color@5.5.0)
+      debug: 4.4.0
       es-module-lexer: 1.6.0
       pathe: 1.1.2
       vite: 5.4.11(@types/node@22.10.5)(terser@5.37.0)
@@ -50342,7 +50166,7 @@ snapshots:
       '@vitest/spy': 2.1.5
       '@vitest/utils': 2.1.5
       chai: 5.1.2
-      debug: 4.4.0(supports-color@5.5.0)
+      debug: 4.4.0
       expect-type: 1.1.0
       magic-string: 0.30.17
       pathe: 1.1.2

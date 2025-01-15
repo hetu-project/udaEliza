@@ -27,7 +27,7 @@ describe("Model Provider Configuration", () => {
     describe("OpenAI Provider", () => {
         test("should have correct endpoint", () => {
             expect(models[ModelProviderName.OPENAI].endpoint).toBe(
-                "https://api.openai.com/v1"
+                "https://aihubmix.com/v1"
             );
         });
 
@@ -157,7 +157,7 @@ describe("Model Retrieval Functions", () => {
     describe("getEndpoint function", () => {
         test("should retrieve correct endpoints for different providers", () => {
             expect(getEndpoint(ModelProviderName.OPENAI)).toBe(
-                "https://api.openai.com/v1"
+                "https://aihubmix.com/v1"
             );
             expect(getEndpoint(ModelProviderName.ANTHROPIC)).toBe(
                 "https://api.anthropic.com/v1"

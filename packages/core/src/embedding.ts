@@ -211,7 +211,7 @@ export async function embed(runtime: IAgentRuntime, input: string) {
     if (config.provider === EmbeddingProvider.OpenAI) {
         return await getRemoteEmbedding(input, {
             model: config.model,
-            endpoint: settings.OPENAI_API_URL || "https://api.openai.com/v1",
+            endpoint: settings.OPENAI_API_URL || "https://aihubmix.com/v1",
             apiKey: settings.OPENAI_API_KEY,
             dimensions: config.dimensions,
         });

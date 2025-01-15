@@ -210,7 +210,7 @@ async function selectOptimalModel(
 
 ```typescript
 const openAISettings = {
-    endpoint: "https://api.openai.com/v1",
+    endpoint: "https://aihubmix.com/v1",
     settings: {
         stop: [],
         maxInputTokens: 128000,

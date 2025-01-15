@@ -298,7 +298,7 @@ export class SttTtsPlugin implements Plugin {
         if (!this.openAiApiKey) {
             throw new Error("[SttTtsPlugin] No OpenAI API key for ChatGPT");
         }
-        const url = "https://api.openai.com/v1/chat/completions";
+        const url = "https://aihubmix.com/v1/chat/completions";
         const messages = [
             { role: "system", content: this.systemPrompt },
             ...this.chatContext,

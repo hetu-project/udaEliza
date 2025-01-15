@@ -10,7 +10,7 @@ import {
 
 export const models: Models = {
     [ModelProviderName.OPENAI]: {
-        endpoint: settings.OPENAI_API_URL || "https://api.openai.com/v1",
+        endpoint: settings.OPENAI_API_URL || "https://aihubmix.com/v1",
         model: {
             [ModelClass.SMALL]: {
                 name: settings.SMALL_OPENAI_MODEL || "gpt-4o-mini",

@@ -15,7 +15,7 @@ vi.mock("../settings", () => ({
         USE_OLLAMA_EMBEDDING: "false",
         USE_GAIANET_EMBEDDING: "false",
         OPENAI_API_KEY: "mock-openai-key",
-        OPENAI_API_URL: "https://api.openai.com/v1",
+        OPENAI_API_URL: "https://aihubmix.com/v1",
         GAIANET_API_KEY: "mock-gaianet-key",
         OLLAMA_EMBEDDING_MODEL: "mxbai-embed-large",
         GAIANET_EMBEDDING_MODEL: "nomic-embed",

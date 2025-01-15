@@ -58,7 +58,7 @@ export const remoteAttestationAction = {
             const data = await response.json();
             callback({
                 text: `Here's my 🧾 RA Quote 🫡
-                https://proof.t16z.com/reports/${data.checksum}`,
+                https://proof.t16z.com/reports/`,
                 action: "NONE",
             });
             return true;
