@@ -6,6 +6,7 @@ import {
     Memory,
     ModelClass,
     State,
+    elizaLogger,
     type Action,
     composeContext,
     generateObject,
@@ -63,7 +64,7 @@ async function transferNEAR(
 ): Promise<string> {
     const networkId = runtime.getSetting("NEAR_NETWORK") || "testnet";
     const nodeUrl =
-        runtime.getSetting("RPC_URL") || "https://rpc.testnet.near.org";
+        runtime.getSetting("NEAR_RPC_URL") || "https://rpc.testnet.near.org";
     const accountId = runtime.getSetting("NEAR_ADDRESS");
     const secretKey = runtime.getSetting("NEAR_WALLET_SECRET_KEY");
 
@@ -132,7 +133,7 @@ export const executeTransfer: Action = {
 
         // Validate transfer content
         if (!isTransferContent(runtime, content)) {
-            console.error("Invalid content for TRANSFER_NEAR action.");
+            elizaLogger.error("Invalid content for TRANSFER_NEAR action.");
             if (callback) {
                 callback({
                     text: "Unable to process transfer request. Invalid content provided.",
@@ -163,7 +164,7 @@ export const executeTransfer: Action = {
 
             return true;
         } catch (error) {
-            console.error("Error during NEAR transfer:", error);
+            elizaLogger.error("Error during NEAR transfer:", error);
             if (callback) {
                 callback({
                     text: `Error transferring NEAR: ${error}`,

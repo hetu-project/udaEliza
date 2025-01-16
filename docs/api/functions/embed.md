@@ -1,4 +1,4 @@
-[@elizaos/core v0.1.6-alpha.4](../index.md) / embed
+[@elizaos/core v0.1.7](../index.md) / embed
 
 # Function: embed()
 
@@ -28,4 +28,4 @@ If the API request fails
 
 ## Defined in
 
-[packages/core/src/embedding.ts:145](https://github.com/elizaos/eliza/blob/main/packages/core/src/embedding.ts#L145)
+[packages/core/src/embedding.ts:162](https://github.com/elizaOS/eliza/blob/main/packages/core/src/embedding.ts#L162)

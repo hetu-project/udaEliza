@@ -55,13 +55,6 @@ async function handler(
     state: State | undefined,
     options: { [key: string]: unknown } = { onlyInProgress: true }
 ): Promise<Goal[]> {
-    // get goals
-    let goalsData = await getGoals({
-        runtime,
-        roomId: message.roomId,
-        onlyInProgress: options.onlyInProgress as boolean,
-    });
-
     state = (await runtime.composeState(message)) as State;
     const context = composeContext({
         state,
@@ -79,10 +72,10 @@ async function handler(
     const updates = parseJsonArrayFromText(response);
 
     // get goals
-    goalsData = await getGoals({
+    const goalsData = await getGoals({
         runtime,
         roomId: message.roomId,
-        onlyInProgress: true,
+        onlyInProgress: options.onlyInProgress as boolean,
     });
 
     // Apply the updates to the goals

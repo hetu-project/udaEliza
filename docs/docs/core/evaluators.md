@@ -119,7 +119,7 @@ interface Objective {
 ### Handler Implementation
 
 - Use runtime services appropriately
-- Store results in correct memory manager
+- Store results in the correct memory manager
 - Handle errors gracefully
 - Maintain state consistency
 

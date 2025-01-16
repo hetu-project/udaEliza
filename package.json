@@ -4,6 +4,8 @@
         "preinstall": "npx only-allow pnpm",
         "build": "turbo run build --filter=!eliza-docs",
         "build-docker": "turbo run build",
+        "cleanstart": "if [ -f agent/data/db.sqlite ]; then rm agent/data/db.sqlite; fi && pnpm --filter \"@elizaos/agent\" start --isRoot",
+        "cleanstart:debug": "if [ -f agent/data/db.sqlite ]; then rm agent/data/db.sqlite; fi && cross-env NODE_ENV=development VERBOSE=true DEBUG=eliza:* pnpm --filter \"@elizaos/agent\" start --isRoot",
         "start": "pnpm --filter \"@elizaos/agent\" start --isRoot",
         "start:client": "pnpm --dir client dev",
         "start:debug": "cross-env NODE_ENV=development VERBOSE=true DEBUG=eliza:* pnpm --filter \"@elizaos/agent\" start --isRoot",
@@ -40,11 +42,16 @@
         "typedoc": "0.26.11",
         "typescript": "5.6.3",
         "vite": "5.4.11",
-        "vitest": "2.1.5"
+        "vitest": "2.1.5",
+        "viem": "2.21.58",
+        "ts-jest": "^29.1.1",
+        "@types/jest": "^29.5.11",
+        "jest": "^29.7.0"
     },
     "pnpm": {
         "overrides": {
-            "onnxruntime-node": "1.20.1"
+            "onnxruntime-node": "1.20.1",
+            "viem": "2.21.58"
         }
     },
     "engines": {

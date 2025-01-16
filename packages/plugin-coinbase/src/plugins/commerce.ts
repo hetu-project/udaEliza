@@ -30,6 +30,7 @@ interface ChargeRequest {
 }
 
 export async function createCharge(apiKey: string, params: ChargeRequest) {
+    elizaLogger.debug("Starting createCharge function");
     try {
         const response = await fetch(url, {
             method: "POST",
@@ -47,13 +48,14 @@ export async function createCharge(apiKey: string, params: ChargeRequest) {
         const data = await response.json();
         return data.data;
     } catch (error) {
-        console.error("Error creating charge:", error);
+        elizaLogger.error("Error creating charge:", error);
         throw error;
     }
 }
 
 // Function to fetch all charges
 export async function getAllCharges(apiKey: string) {
+    elizaLogger.debug("Starting getAllCharges function");
     try {
         const response = await fetch(url, {
             method: "GET",
@@ -72,14 +74,15 @@ export async function getAllCharges(apiKey: string) {
         const data = await response.json();
         return data.data;
     } catch (error) {
-        console.error("Error fetching charges:", error);
+        elizaLogger.error("Error fetching charges:", error);
         throw error;
     }
 }
 
 // Function to fetch details of a specific charge
 export async function getChargeDetails(apiKey: string, chargeId: string) {
-    const getUrl = `${url}${chargeId}`;
+    elizaLogger.debug("Starting getChargeDetails function");
+    const getUrl = `${url}/${chargeId}`;
 
     try {
         const response = await fetch(getUrl, {
@@ -99,7 +102,7 @@ export async function getChargeDetails(apiKey: string, chargeId: string) {
         const data = await response.json();
         return data;
     } catch (error) {
-        console.error(
+        elizaLogger.error(
             `Error fetching charge details for ID ${chargeId}:`,
             error
         );
@@ -140,7 +143,7 @@ export const createCoinbaseChargeAction: Action = {
         _options: any,
         callback: HandlerCallback
     ) => {
-        elizaLogger.log("Composing state for message:", message);
+        elizaLogger.info("Composing state for message:", message);
         if (!state) {
             state = (await runtime.composeState(message)) as State;
         } else {
@@ -172,10 +175,10 @@ export const createCoinbaseChargeAction: Action = {
             return;
         }
 
-        elizaLogger.log("Charge details received:", chargeDetails);
+        elizaLogger.info("Charge details received:", chargeDetails);
 
         // Initialize Coinbase Commerce client
-
+        elizaLogger.debug("Starting Coinbase Commerce client initialization");
         try {
             // Create a charge
             const chargeResponse = await createCharge(
@@ -191,7 +194,7 @@ export const createCoinbaseChargeAction: Action = {
                 }
             );
 
-            elizaLogger.log(
+            elizaLogger.info(
                 "Coinbase Commerce charge created:",
                 chargeResponse
             );
@@ -201,8 +204,8 @@ export const createCoinbaseChargeAction: Action = {
                     text: `Charge created successfully: ${chargeResponse.hosted_url}`,
                     attachments: [
                         {
-                            id: crypto.randomUUID(),
-                            url: chargeResponse.id,
+                            id: chargeResponse.id,
+                            url: chargeResponse.hosted_url,
                             title: "Coinbase Commerce Charge",
                             description: `Charge ID: ${chargeResponse.id}`,
                             text: `Pay here: ${chargeResponse.hosted_url}`,
@@ -333,7 +336,7 @@ export const getAllChargesAction: Action = {
         callback: HandlerCallback
     ) => {
         try {
-            elizaLogger.log("Composing state for message:", message);
+            elizaLogger.info("Composing state for message:", message);
             if (!state) {
                 state = (await runtime.composeState(message)) as State;
             } else {
@@ -343,11 +346,12 @@ export const getAllChargesAction: Action = {
                 runtime.getSetting("COINBASE_COMMERCE_KEY")
             );
 
-            elizaLogger.log("Fetched all charges:", charges);
+            elizaLogger.info("Fetched all charges:", charges);
 
             callback(
                 {
                     text: `Successfully fetched all charges. Total charges: ${charges.length}`,
+                    attachments: charges,
                 },
                 []
             );
@@ -397,7 +401,7 @@ export const getChargeDetailsAction: Action = {
         _options: any,
         callback: HandlerCallback
     ) => {
-        elizaLogger.log("Composing state for message:", message);
+        elizaLogger.info("Composing state for message:", message);
         if (!state) {
             state = (await runtime.composeState(message)) as State;
         } else {
@@ -434,19 +438,22 @@ export const getChargeDetailsAction: Action = {
                 charge.id
             );
 
-            elizaLogger.log("Fetched charge details:", chargeDetails);
+            elizaLogger.info("Fetched charge details:", chargeDetails);
+
+            const chargeData = chargeDetails.data;
 
             callback(
                 {
                     text: `Successfully fetched charge details for ID: ${charge.id}`,
                     attachments: [
                         {
-                            id: crypto.randomUUID(),
-                            url: chargeDetails.hosted_url,
+                            id: chargeData.id,
+                            url: chargeData.hosted_url,
                             title: `Charge Details for ${charge.id}`,
-                            description: `Details: ${JSON.stringify(chargeDetails, null, 2)}`,
                             source: "coinbase",
-                            text: "",
+                            description: JSON.stringify(chargeDetails, null, 2),
+                            text: `Pay here: ${chargeData.hosted_url}`,
+                            contentType: "application/json",
                         },
                     ],
                 },
@@ -486,6 +493,7 @@ export const getChargeDetailsAction: Action = {
 
 export const chargeProvider: Provider = {
     get: async (runtime: IAgentRuntime, _message: Memory) => {
+        elizaLogger.debug("Starting chargeProvider.get function");
         const charges = await getAllCharges(
             runtime.getSetting("COINBASE_COMMERCE_KEY")
         );
@@ -504,8 +512,8 @@ export const chargeProvider: Provider = {
                 privateKey: coinbasePrivateKey,
             });
             const { balances, transactions } = await getWalletDetails(runtime);
-            elizaLogger.log("Current Balances:", balances);
-            elizaLogger.log("Last Transactions:", transactions);
+            elizaLogger.info("Current Balances:", balances);
+            elizaLogger.info("Last Transactions:", transactions);
         }
         const formattedCharges = charges.map((charge) => ({
             id: charge.id,
@@ -513,7 +521,7 @@ export const chargeProvider: Provider = {
             description: charge.description,
             pricing: charge.pricing,
         }));
-        elizaLogger.log("Charges:", formattedCharges);
+        elizaLogger.info("Charges:", formattedCharges);
         return { charges: formattedCharges, balances, transactions };
     },
 };

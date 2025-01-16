@@ -1,4 +1,4 @@
-[@elizaos/core v0.1.6-alpha.4](../index.md) / ConversationExample
+[@elizaos/core v0.1.7](../index.md) / ConversationExample
 
 # Interface: ConversationExample
 
@@ -10,11 +10,11 @@ Example conversation content with user ID
 
 > **userId**: \`$\{string\}-$\{string\}-$\{string\}-$\{string\}-$\{string\}\`
 
-UUID of user in conversation
+UUID of the user in conversation
 
 #### Defined in
 
-[packages/core/src/types.ts:50](https://github.com/elizaos/eliza/blob/main/packages/core/src/types.ts#L50)
+[packages/core/src/types.ts:50](https://github.com/elizaOS/eliza/blob/main/packages/core/src/types.ts#L50)
 
 ---
 
@@ -26,4 +26,4 @@ Content of the conversation
 
 #### Defined in
 
-[packages/core/src/types.ts:53](https://github.com/elizaos/eliza/blob/main/packages/core/src/types.ts#L53)
+[packages/core/src/types.ts:53](https://github.com/elizaOS/eliza/blob/main/packages/core/src/types.ts#L53)

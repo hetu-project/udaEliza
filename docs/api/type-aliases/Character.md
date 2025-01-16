@@ -1,4 +1,4 @@
-[@elizaos/core v0.1.6-alpha.4](../index.md) / Character
+[@elizaos/core v0.1.7](../index.md) / Character
 
 # Type Alias: Character
 
@@ -44,6 +44,12 @@ Model provider to use
 
 Image model provider to use, if different from modelProvider
 
+### imageVisionModelProvider?
+
+> `optional` **imageVisionModelProvider**: [`ModelProviderName`](../enumerations/ModelProviderName.md)
+
+Image Vision model provider to use, if different from modelProvider
+
 ### modelEndpointOverride?
 
 > `optional` **modelEndpointOverride**: `string`
@@ -83,6 +89,10 @@ Optional prompt templates
 ### templates.twitterSearchTemplate?
 
 > `optional` **twitterSearchTemplate**: `string`
+
+### templates.twitterActionTemplate?
+
+> `optional` **twitterActionTemplate**: `string`
 
 ### templates.twitterPostTemplate?
 
@@ -220,6 +230,58 @@ Optional configuration
 
 > `optional` **intiface**: `boolean`
 
+### settings.imageSettings?
+
+> `optional` **imageSettings**: `object`
+
+### settings.imageSettings.steps?
+
+> `optional` **steps**: `number`
+
+### settings.imageSettings.width?
+
+> `optional` **width**: `number`
+
+### settings.imageSettings.height?
+
+> `optional` **height**: `number`
+
+### settings.imageSettings.negativePrompt?
+
+> `optional` **negativePrompt**: `string`
+
+### settings.imageSettings.numIterations?
+
+> `optional` **numIterations**: `number`
+
+### settings.imageSettings.guidanceScale?
+
+> `optional` **guidanceScale**: `number`
+
+### settings.imageSettings.seed?
+
+> `optional` **seed**: `number`
+
+### settings.imageSettings.modelId?
+
+> `optional` **modelId**: `string`
+
+### settings.imageSettings.jobId?
+
+> `optional` **jobId**: `string`
+
+### settings.imageSettings.count?
+
+> `optional` **count**: `number`
+
+### settings.imageSettings.stylePreset?
+
+> `optional` **stylePreset**: `string`
+
+### settings.imageSettings.hideWatermark?
+
+> `optional` **hideWatermark**: `boolean`
+
 ### settings.voice?
 
 > `optional` **voice**: `object`
@@ -266,6 +328,10 @@ New structured ElevenLabs config
 
 > `optional` **model**: `string`
 
+### settings.modelConfig?
+
+> `optional` **modelConfig**: [`ModelConfiguration`](../interfaces/ModelConfiguration.md)
+
 ### settings.embeddingModel?
 
 > `optional` **embeddingModel**: `string`
@@ -285,6 +351,10 @@ New structured ElevenLabs config
 ### settings.chains.solana?
 
 > `optional` **solana**: `any`[]
+
+### settings.transcription?
+
+> `optional` **transcription**: [`TranscriptionProvider`](../enumerations/TranscriptionProvider.md)
 
 ### clientConfig?
 
@@ -384,6 +454,26 @@ Optional client-specific config
 
 > `optional` **shouldIgnoreDirectMessages**: `boolean`
 
+### clientConfig.gitbook?
+
+> `optional` **gitbook**: `object`
+
+### clientConfig.gitbook.keywords?
+
+> `optional` **keywords**: `object`
+
+### clientConfig.gitbook.keywords.projectTerms?
+
+> `optional` **projectTerms**: `string`[]
+
+### clientConfig.gitbook.keywords.generalQueries?
+
+> `optional` **generalQueries**: `string`[]
+
+### clientConfig.gitbook.documentTriggers?
+
+> `optional` **documentTriggers**: `string`[]
+
 ### style
 
 > **style**: `object`
@@ -440,4 +530,4 @@ Optional NFT prompt
 
 ## Defined in
 
-[packages/core/src/types.ts:629](https://github.com/elizaos/eliza/blob/main/packages/core/src/types.ts#L629)
+[packages/core/src/types.ts:671](https://github.com/elizaOS/eliza/blob/main/packages/core/src/types.ts#L671)

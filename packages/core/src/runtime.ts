@@ -1,3 +1,5 @@
+import { readFile } from "fs/promises";
+import { join } from "path";
 import { names, uniqueNamesGenerator } from "unique-names-generator";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -22,6 +24,7 @@ import { formatActors, formatMessages, getActorDetails } from "./messages.ts";
 import { parseJsonArrayFromText } from "./parsing.ts";
 import { formatPosts } from "./posts.ts";
 import { getProviders } from "./providers.ts";
+import { RAGKnowledgeManager } from "./ragknowledge.ts";
 import settings from "./settings.ts";
 import {
     Character,
@@ -31,7 +34,11 @@ import {
     ICacheManager,
     IDatabaseAdapter,
     IMemoryManager,
+    IRAGKnowledgeManager,
+    IVerifiableInferenceAdapter,
     KnowledgeItem,
+    //RAGKnowledgeItem,
+    //Media,
     ModelClass,
     ModelProviderName,
     Plugin,
@@ -104,6 +111,11 @@ export class AgentRuntime implements IAgentRuntime {
     imageModelProvider: ModelProviderName;
 
     /**
+     * The model to use for describing images.
+     */
+    imageVisionModelProvider: ModelProviderName;
+
+    /**
      * Fetch function to use
      * Some environments may not have access to the global fetch function and need a custom fetch override.
      */
@@ -139,10 +151,14 @@ export class AgentRuntime implements IAgentRuntime {
      */
     knowledgeManager: IMemoryManager;
 
+    ragKnowledgeManager: IRAGKnowledgeManager;
+
     services: Map<ServiceType, Service> = new Map();
     memoryManagers: Map<string, IMemoryManager> = new Map();
     cacheManager: ICacheManager;
     clients: Record<string, any>;
+
+    verifiableInferenceAdapter?: IVerifiableInferenceAdapter;
 
     registerMemoryManager(manager: IMemoryManager): void {
         if (!manager.tableName) {
@@ -225,6 +241,7 @@ export class AgentRuntime implements IAgentRuntime {
         speechModelPath?: string;
         cacheManager: ICacheManager;
         logging?: boolean;
+        verifiableInferenceAdapter?: IVerifiableInferenceAdapter;
     }) {
         elizaLogger.info("Initializing AgentRuntime with options:", {
             character: opts.character?.name,
@@ -258,7 +275,7 @@ export class AgentRuntime implements IAgentRuntime {
             this.ensureParticipantExists(this.agentId, this.agentId);
         });
 
-        elizaLogger.success("Agent ID", this.agentId);
+        elizaLogger.success(`Agent ID: ${this.agentId}`);
 
         this.fetch = (opts.fetch as typeof fetch) ?? this.fetch;
 
@@ -287,6 +304,11 @@ export class AgentRuntime implements IAgentRuntime {
         this.knowledgeManager = new MemoryManager({
             runtime: this,
             tableName: "fragments",
+        });
+
+        this.ragKnowledgeManager = new RAGKnowledgeManager({
+            runtime: this,
+            tableName: "knowledge",
         });
 
         (opts.managers ?? []).forEach((manager: IMemoryManager) => {
@@ -322,6 +344,15 @@ export class AgentRuntime implements IAgentRuntime {
         elizaLogger.info(
             "Selected image model provider:",
             this.imageModelProvider
+        );
+
+        this.imageVisionModelProvider =
+            this.character.imageVisionModelProvider ?? this.modelProvider;
+
+        elizaLogger.info("Selected model provider:", this.modelProvider);
+        elizaLogger.info(
+            "Selected image model provider:",
+            this.imageVisionModelProvider
         );
 
         // Validate model provider
@@ -374,6 +405,8 @@ export class AgentRuntime implements IAgentRuntime {
         (opts.evaluators ?? []).forEach((evaluator: Evaluator) => {
             this.registerEvaluator(evaluator);
         });
+
+        this.verifiableInferenceAdapter = opts.verifiableInferenceAdapter;
     }
 
     async initialize() {
@@ -405,27 +438,42 @@ export class AgentRuntime implements IAgentRuntime {
             this.character.knowledge &&
             this.character.knowledge.length > 0
         ) {
-            await this.processCharacterKnowledge(this.character.knowledge);
+            if (this.character.settings.ragKnowledge) {
+                await this.processCharacterRAGKnowledge(
+                    this.character.knowledge
+                );
+            } else {
+                const stringKnowledge = this.character.knowledge.filter(
+                    (item): item is string => typeof item === "string"
+                );
+
+                await this.processCharacterKnowledge(stringKnowledge);
+            }
         }
     }
 
     async stop() {
-      elizaLogger.debug('runtime::stop - character', this.character)
-      // stop services, they don't have a stop function
+        elizaLogger.debug("runtime::stop - character", this.character);
+        // stop services, they don't have a stop function
         // just initialize
 
-      // plugins
+        // plugins
         // have actions, providers, evaluators (no start/stop)
         // services (just initialized), clients
 
-      // client have a start
-      for(const cStr in this.clients) {
-        const c = this.clients[cStr]
-        elizaLogger.log('runtime::stop - requesting', cStr, 'client stop for', this.character.name)
-        c.stop()
-      }
-      // we don't need to unregister with directClient
-      // don't need to worry about knowledge
+        // client have a start
+        for (const cStr in this.clients) {
+            const c = this.clients[cStr];
+            elizaLogger.log(
+                "runtime::stop - requesting",
+                cStr,
+                "client stop for",
+                this.character.name
+            );
+            c.stop();
+        }
+        // we don't need to unregister with directClient
+        // don't need to worry about knowledge
     }
 
     /**
@@ -456,6 +504,166 @@ export class AgentRuntime implements IAgentRuntime {
                     text: item,
                 },
             });
+        }
+    }
+
+    /**
+     * Processes character knowledge by creating document memories and fragment memories.
+     * This function takes an array of knowledge items, creates a document knowledge for each item if it doesn't exist,
+     * then chunks the content into fragments, embeds each fragment, and creates fragment knowledge.
+     * An array of knowledge items or objects containing id, path, and content.
+     */
+    private async processCharacterRAGKnowledge(
+        items: (string | { path: string; shared?: boolean })[]
+    ) {
+        let hasError = false;
+
+        for (const item of items) {
+            if (!item) continue;
+
+            try {
+                // Check if item is marked as shared
+                let isShared = false;
+                let contentItem = item;
+
+                // Only treat as shared if explicitly marked
+                if (typeof item === "object" && "path" in item) {
+                    isShared = item.shared === true;
+                    contentItem = item.path;
+                } else {
+                    contentItem = item;
+                }
+
+                const knowledgeId = stringToUuid(contentItem);
+                const fileExtension = contentItem
+                    .split(".")
+                    .pop()
+                    ?.toLowerCase();
+
+                // Check if it's a file or direct knowledge
+                if (
+                    fileExtension &&
+                    ["md", "txt", "pdf"].includes(fileExtension)
+                ) {
+                    try {
+                        const rootPath = join(process.cwd(), "..");
+                        const filePath = join(
+                            rootPath,
+                            "characters",
+                            "knowledge",
+                            contentItem
+                        );
+                        elizaLogger.info(
+                            "Attempting to read file from:",
+                            filePath
+                        );
+
+                        // Get existing knowledge first
+                        const existingKnowledge =
+                            await this.ragKnowledgeManager.getKnowledge({
+                                id: knowledgeId,
+                                agentId: this.agentId,
+                            });
+
+                        const content: string = await readFile(
+                            filePath,
+                            "utf8"
+                        );
+                        if (!content) {
+                            hasError = true;
+                            continue;
+                        }
+
+                        // If the file exists in DB, check if content has changed
+                        if (existingKnowledge.length > 0) {
+                            const existingContent =
+                                existingKnowledge[0].content.text;
+                            if (existingContent === content) {
+                                elizaLogger.info(
+                                    `File ${contentItem} unchanged, skipping`
+                                );
+                                continue;
+                            } else {
+                                // If content changed, remove old knowledge before adding new
+                                await this.ragKnowledgeManager.removeKnowledge(
+                                    knowledgeId
+                                );
+                                // Also remove any associated chunks - this is needed for non-PostgreSQL adapters
+                                // PostgreSQL adapter handles chunks internally via foreign keys
+                                await this.ragKnowledgeManager.removeKnowledge(
+                                    `${knowledgeId}-chunk-*` as UUID
+                                );
+                            }
+                        }
+
+                        elizaLogger.info(
+                            `Successfully read ${fileExtension.toUpperCase()} file content for`,
+                            this.character.name,
+                            "-",
+                            contentItem
+                        );
+
+                        await this.ragKnowledgeManager.processFile({
+                            path: contentItem,
+                            content: content,
+                            type: fileExtension as "pdf" | "md" | "txt",
+                            isShared: isShared,
+                        });
+                    } catch (error: any) {
+                        hasError = true;
+                        elizaLogger.error(
+                            `Failed to read knowledge file ${contentItem}. Error details:`,
+                            error?.message || error || "Unknown error"
+                        );
+                        continue; // Continue to next item even if this one fails
+                    }
+                } else {
+                    // Handle direct knowledge string
+                    elizaLogger.info(
+                        "Processing direct knowledge for",
+                        this.character.name,
+                        "-",
+                        contentItem.slice(0, 100)
+                    );
+
+                    const existingKnowledge =
+                        await this.ragKnowledgeManager.getKnowledge({
+                            id: knowledgeId,
+                            agentId: this.agentId,
+                        });
+
+                    if (existingKnowledge.length > 0) {
+                        elizaLogger.info(
+                            `Direct knowledge ${knowledgeId} already exists, skipping`
+                        );
+                        continue;
+                    }
+
+                    await this.ragKnowledgeManager.createKnowledge({
+                        id: knowledgeId,
+                        agentId: this.agentId,
+                        content: {
+                            text: contentItem,
+                            metadata: {
+                                type: "direct",
+                            },
+                        },
+                    });
+                }
+            } catch (error: any) {
+                hasError = true;
+                elizaLogger.error(
+                    `Error processing knowledge item ${item}:`,
+                    error?.message || error || "Unknown error"
+                );
+                continue; // Continue to next item even if this one fails
+            }
+        }
+
+        if (hasError) {
+            elizaLogger.warn(
+                "Some knowledge items failed to process, but continuing with available knowledge"
+            );
         }
     }
 
@@ -601,7 +809,7 @@ export class AgentRuntime implements IAgentRuntime {
      */
     async evaluate(
         message: Memory,
-        state?: State,
+        state: State,
         didRespond?: boolean,
         callback?: HandlerCallback
     ) {
@@ -623,10 +831,12 @@ export class AgentRuntime implements IAgentRuntime {
         );
 
         const resolvedEvaluators = await Promise.all(evaluatorPromises);
-        const evaluatorsData = resolvedEvaluators.filter(Boolean);
+        const evaluatorsData = resolvedEvaluators.filter(
+            (evaluator): evaluator is Evaluator => evaluator !== null
+        );
 
         // if there are no evaluators this frame, return
-        if (evaluatorsData.length === 0) {
+        if (!evaluatorsData || evaluatorsData.length === 0) {
             return [];
         }
 
@@ -645,6 +855,7 @@ export class AgentRuntime implements IAgentRuntime {
             runtime: this,
             context,
             modelClass: ModelClass.SMALL,
+            verifiableInferenceAdapter: this.verifiableInferenceAdapter,
         });
 
         const evaluators = parseJsonArrayFromText(
@@ -652,7 +863,7 @@ export class AgentRuntime implements IAgentRuntime {
         ) as unknown as string[];
 
         for (const evaluator of this.evaluators) {
-            if (!evaluators.includes(evaluator.name)) continue;
+            if (!evaluators?.includes(evaluator.name)) continue;
 
             if (evaluator.handler)
                 await evaluator.handler(this, message, state, {}, callback);
@@ -831,7 +1042,8 @@ export class AgentRuntime implements IAgentRuntime {
             );
 
             if (lastMessageWithAttachment) {
-                const lastMessageTime = lastMessageWithAttachment.createdAt;
+                const lastMessageTime =
+                    lastMessageWithAttachment?.createdAt ?? Date.now();
                 const oneHourBeforeLastMessage =
                     lastMessageTime - 60 * 60 * 1000; // 1 hour before last message
 
@@ -921,18 +1133,11 @@ Text: ${attachment.text}
             ]);
 
             // Check the existing memories in the database
-            const existingMemories =
-                await this.messageManager.getMemoriesByRoomIds({
-                    // filter out the current room id from rooms
-                    roomIds: rooms.filter((room) => room !== roomId),
-                });
-
-            // Sort messages by timestamp in descending order
-            existingMemories.sort((a, b) => b.createdAt - a.createdAt);
-
-            // Take the most recent messages
-            const recentInteractionsData = existingMemories.slice(0, 20);
-            return recentInteractionsData;
+            return this.messageManager.getMemoriesByRoomIds({
+                // filter out the current room id from rooms
+                roomIds: rooms.filter((room) => room !== roomId),
+                limit: 20,
+            });
         };
 
         const recentInteractions =
@@ -995,9 +1200,27 @@ Text: ${attachment.text}
                 .join(" ");
         }
 
-        const knowledegeData = await knowledge.get(this, message);
+        let knowledgeData = [];
+        let formattedKnowledge = "";
 
-        const formattedKnowledge = formatKnowledge(knowledegeData);
+        if (this.character.settings?.ragKnowledge) {
+            const recentContext = recentMessagesData
+                .slice(-3) // Last 3 messages
+                .map((msg) => msg.content.text)
+                .join(" ");
+
+            knowledgeData = await this.ragKnowledgeManager.getKnowledge({
+                query: message.content.text,
+                conversationContext: recentContext,
+                limit: 5,
+            });
+
+            formattedKnowledge = formatKnowledge(knowledgeData);
+        } else {
+            knowledgeData = await knowledge.get(this, message);
+
+            formattedKnowledge = formatKnowledge(knowledgeData);
+        }
 
         const initialState = {
             agentId: this.agentId,
@@ -1014,7 +1237,8 @@ Text: ${attachment.text}
                       ]
                     : "",
             knowledge: formattedKnowledge,
-            knowledgeData: knowledegeData,
+            knowledgeData: knowledgeData,
+            ragKnowledgeData: knowledgeData,
             // Recent interactions between the sender and receiver, formatted as messages
             recentMessageInteractions: formattedMessageInteractions,
             // Recent interactions between the sender and receiver, formatted as posts
@@ -1241,13 +1465,14 @@ Text: ${attachment.text}
             );
 
             if (lastMessageWithAttachment) {
-                const lastMessageTime = lastMessageWithAttachment.createdAt;
+                const lastMessageTime =
+                    lastMessageWithAttachment?.createdAt ?? Date.now();
                 const oneHourBeforeLastMessage =
                     lastMessageTime - 60 * 60 * 1000; // 1 hour before last message
 
                 allAttachments = recentMessagesData
                     .filter((msg) => {
-                        const msgTime = msg.createdAt;
+                        const msgTime = msg.createdAt ?? Date.now();
                         return msgTime >= oneHourBeforeLastMessage;
                     })
                     .flatMap((msg) => msg.content.attachments || []);
@@ -1276,6 +1501,14 @@ Text: ${attachment.text}
             recentMessagesData,
             attachments: formattedAttachments,
         } as State;
+    }
+
+    getVerifiableInferenceAdapter(): IVerifiableInferenceAdapter | undefined {
+        return this.verifiableInferenceAdapter;
+    }
+
+    setVerifiableInferenceAdapter(adapter: IVerifiableInferenceAdapter): void {
+        this.verifiableInferenceAdapter = adapter;
     }
 }
 

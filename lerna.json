@@ -1,11 +1,11 @@
 {
-  "version": "0.1.7-alpha.1",
-  "packages": [
-    "packages/*",
-    "docs",
-    "agent",
-    "client",
-    "!packages/_examples"
-  ],
-  "npmClient": "pnpm"
+    "version": "0.1.7",
+    "packages": [
+        "packages/*",
+        "docs",
+        "agent",
+        "client",
+        "!packages/_examples"
+    ],
+    "npmClient": "pnpm"
 }

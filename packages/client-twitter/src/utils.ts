@@ -4,7 +4,6 @@ import { Content, Memory, UUID } from "@elizaos/core";
 import { stringToUuid } from "@elizaos/core";
 import { ClientBase } from "./base";
 import { elizaLogger } from "@elizaos/core";
-import { DEFAULT_MAX_TWEET_LENGTH } from "./environment";
 import { Media } from "@elizaos/core";
 import fs from "fs";
 import path from "path";
@@ -172,11 +171,10 @@ export async function sendTweet(
     twitterUsername: string,
     inReplyTo: string
 ): Promise<Memory[]> {
-    const tweetChunks = splitTweetContent(
-        content.text,
-        Number(client.runtime.getSetting("MAX_TWEET_LENGTH")) ||
-            DEFAULT_MAX_TWEET_LENGTH
-    );
+    const maxTweetLength = client.twitterConfig.MAX_TWEET_LENGTH;
+    const isLongTweet = maxTweetLength > 280;
+
+    const tweetChunks = splitTweetContent(content.text, maxTweetLength);
     const sentTweets: Tweet[] = [];
     let previousTweetId = inReplyTo;
 
@@ -214,20 +212,31 @@ export async function sendTweet(
                 })
             );
         }
-        const result = await client.requestQueue.add(
-            async () =>
-                await client.twitterClient.sendTweet(
-                    chunk.trim(),
-                    previousTweetId,
-                    mediaData
-                )
+
+        const cleanChunk = deduplicateMentions(chunk.trim())
+
+        const result = await client.requestQueue.add(async () =>
+            isLongTweet
+                ? client.twitterClient.sendLongTweet(
+                      cleanChunk,
+                      previousTweetId,
+                      mediaData
+                  )
+                : client.twitterClient.sendTweet(
+                      cleanChunk,
+                      previousTweetId,
+                      mediaData
+                  )
         );
+
         const body = await result.json();
+        const tweetResult = isLongTweet
+            ? body?.data?.notetweet_create?.tweet_results?.result
+            : body?.data?.create_tweet?.tweet_results?.result;
 
         // if we have a response
-        if (body?.data?.create_tweet?.tweet_results?.result) {
+        if (tweetResult) {
             // Parse the response
-            const tweetResult = body.data.create_tweet.tweet_results.result;
             const finalTweet: Tweet = {
                 id: tweetResult.rest_id,
                 text: tweetResult.legacy.full_text,
@@ -247,7 +256,10 @@ export async function sendTweet(
             sentTweets.push(finalTweet);
             previousTweetId = finalTweet.id;
         } else {
-            console.error("Error sending chunk", chunk, "repsonse:", body);
+            elizaLogger.error("Error sending tweet chunk:", {
+                chunk,
+                response: body,
+            });
         }
 
         // Wait a bit between tweets to avoid rate limiting issues
@@ -312,11 +324,31 @@ function splitTweetContent(content: string, maxLength: number): string[] {
     return tweets;
 }
 
-function splitParagraph(paragraph: string, maxLength: number): string[] {
-    // eslint-disable-next-line
-    const sentences = paragraph.match(/[^\.!\?]+[\.!\?]+|[^\.!\?]+$/g) || [
-        paragraph,
-    ];
+function extractUrls(paragraph: string): {
+    textWithPlaceholders: string;
+    placeholderMap: Map<string, string>;
+} {
+    // replace https urls with placeholder
+    const urlRegex = /https?:\/\/[^\s]+/g;
+    const placeholderMap = new Map<string, string>();
+
+    let urlIndex = 0;
+    const textWithPlaceholders = paragraph.replace(urlRegex, (match) => {
+        // twitter url would be considered as 23 characters
+        // <<URL_CONSIDERER_23_1>> is also 23 characters
+        const placeholder = `<<URL_CONSIDERER_23_${urlIndex}>>`; // Placeholder without . ? ! etc
+        placeholderMap.set(placeholder, match);
+        urlIndex++;
+        return placeholder;
+    });
+
+    return { textWithPlaceholders, placeholderMap };
+}
+
+function splitSentencesAndWords(text: string, maxLength: number): string[] {
+    // Split by periods, question marks and exclamation marks
+    // Note that URLs in text have been replaced with `<<URL_xxx>>` and won't be split by dots
+    const sentences = text.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [text];
     const chunks: string[] = [];
     let currentChunk = "";
 
@@ -328,13 +360,16 @@ function splitParagraph(paragraph: string, maxLength: number): string[] {
                 currentChunk = sentence;
             }
         } else {
+            // Can't fit more, push currentChunk to results
             if (currentChunk) {
                 chunks.push(currentChunk.trim());
             }
+
+            // If current sentence itself is less than or equal to maxLength
             if (sentence.length <= maxLength) {
                 currentChunk = sentence;
             } else {
-                // Split long sentence into smaller pieces
+                // Need to split sentence by spaces
                 const words = sentence.split(" ");
                 currentChunk = "";
                 for (const word of words) {
@@ -357,9 +392,66 @@ function splitParagraph(paragraph: string, maxLength: number): string[] {
         }
     }
 
+    // Handle remaining content
     if (currentChunk) {
         chunks.push(currentChunk.trim());
     }
 
     return chunks;
+}
+
+function deduplicateMentions(paragraph: string) {
+    // Regex to match mentions at the beginning of the string
+  const mentionRegex = /^@(\w+)(?:\s+@(\w+))*(\s+|$)/;
+
+  // Find all matches
+  const matches = paragraph.match(mentionRegex);
+
+  if (!matches) {
+    return paragraph; // If no matches, return the original string
+  }
+
+  // Extract mentions from the match groups
+  let mentions = matches.slice(1).filter(Boolean) as string[];
+
+  // Deduplicate mentions
+  mentions = [...new Set(mentions)];
+
+  // Reconstruct the string with deduplicated mentions
+  const uniqueMentionsString = `@${mentions.join(' ')}`;
+
+  // Find where the mentions end in the original string
+  const endOfMentions = paragraph.indexOf(matches[0]) + matches[0].length;
+
+  // Construct the result by combining unique mentions with the rest of the string
+  return uniqueMentionsString + paragraph.slice(endOfMentions);
+}
+
+function restoreUrls(
+    chunks: string[],
+    placeholderMap: Map<string, string>
+): string[] {
+    return chunks.map((chunk) => {
+        // Replace all <<URL_CONSIDERER_23_>> in chunk back to original URLs using regex
+        return chunk.replace(/<<URL_CONSIDERER_23_(\d+)>>/g, (match) => {
+            const original = placeholderMap.get(match);
+            return original || match; // Return placeholder if not found (theoretically won't happen)
+        });
+    });
+}
+
+function splitParagraph(paragraph: string, maxLength: number): string[] {
+    // 1) Extract URLs and replace with placeholders
+    const { textWithPlaceholders, placeholderMap } = extractUrls(paragraph);
+
+    // 2) Use first section's logic to split by sentences first, then do secondary split
+    const splittedChunks = splitSentencesAndWords(
+        textWithPlaceholders,
+        maxLength
+    );
+
+    // 3) Replace placeholders back to original URLs
+    const restoredChunks = restoreUrls(splittedChunks, placeholderMap);
+
+    return restoredChunks;
 }

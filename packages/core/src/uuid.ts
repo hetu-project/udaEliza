@@ -1,5 +1,13 @@
 import { sha1 } from "js-sha1";
 import { UUID } from "./types.ts";
+import { z } from "zod";
+
+export const uuidSchema = z.string().uuid() as z.ZodType<UUID>;
+
+export function validateUuid(value: unknown): UUID | null {
+    const result = uuidSchema.safeParse(value);
+    return result.success ? result.data : null;
+}
 
 export function stringToUuid(target: string | number): UUID {
     if (typeof target === "number") {

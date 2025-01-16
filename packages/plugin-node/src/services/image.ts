@@ -1,10 +1,12 @@
-import { elizaLogger, models } from "@elizaos/core";
-import { Service } from "@elizaos/core";
 import {
+    elizaLogger,
+    getEndpoint,
     IAgentRuntime,
-    ModelProviderName,
-    ServiceType,
     IImageDescriptionService,
+    ModelProviderName,
+    models,
+    Service,
+    ServiceType,
 } from "@elizaos/core";
 import {
     AutoProcessor,
@@ -22,32 +24,54 @@ import gifFrames from "gif-frames";
 import os from "os";
 import path from "path";
 
-export class ImageDescriptionService
-    extends Service
-    implements IImageDescriptionService
-{
-    static serviceType: ServiceType = ServiceType.IMAGE_DESCRIPTION;
+const IMAGE_DESCRIPTION_PROMPT =
+    "Describe this image and give it a title. The first line should be the title, and then a line break, then a detailed description of the image. Respond with the format 'title\\ndescription'";
 
-    private modelId: string = "onnx-community/Florence-2-base-ft";
-    private device: string = "gpu";
+interface ImageProvider {
+    initialize(): Promise<void>;
+    describeImage(
+        imageData: Buffer,
+        mimeType: string
+    ): Promise<{ title: string; description: string }>;
+}
+
+// Utility functions
+const convertToBase64DataUrl = (
+    imageData: Buffer,
+    mimeType: string
+): string => {
+    const base64Data = imageData.toString("base64");
+    return `data:${mimeType};base64,${base64Data}`;
+};
+
+const handleApiError = async (
+    response: Response,
+    provider: string
+): Promise<never> => {
+    const responseText = await response.text();
+    elizaLogger.error(
+        `${provider} API error:`,
+        response.status,
+        "-",
+        responseText
+    );
+    throw new Error(`HTTP error! status: ${response.status}`);
+};
+
+const parseImageResponse = (
+    text: string
+): { title: string; description: string } => {
+    const [title, ...descriptionParts] = text.split("\n");
+    return { title, description: descriptionParts.join("\n") };
+};
+
+class LocalImageProvider implements ImageProvider {
     private model: PreTrainedModel | null = null;
     private processor: Florence2Processor | null = null;
     private tokenizer: PreTrainedTokenizer | null = null;
-    private initialized: boolean = false;
-    private runtime: IAgentRuntime | null = null;
-    private queue: string[] = [];
-    private processing: boolean = false;
+    private modelId: string = "onnx-community/Florence-2-base-ft";
 
-    getInstance(): IImageDescriptionService {
-        return ImageDescriptionService.getInstance();
-    }
-
-    async initialize(runtime: IAgentRuntime): Promise<void> {
-        console.log("Initializing ImageDescriptionService");
-        this.runtime = runtime;
-    }
-
-    private async initializeLocalModel(): Promise<void> {
+    async initialize(): Promise<void> {
         env.allowLocalModels = false;
         env.allowRemoteModels = true;
         env.backends.onnx.logLevel = "fatal";
@@ -55,7 +79,6 @@ export class ImageDescriptionService
         env.backends.onnx.wasm.numThreads = 1;
 
         elizaLogger.info("Downloading Florence model...");
-
         this.model = await Florence2ForConditionalGeneration.from_pretrained(
             this.modelId,
             {
@@ -77,8 +100,6 @@ export class ImageDescriptionService
             }
         );
 
-        elizaLogger.success("Florence model downloaded successfully");
-
         elizaLogger.info("Downloading processor...");
         this.processor = (await AutoProcessor.from_pretrained(
             this.modelId
@@ -90,57 +111,212 @@ export class ImageDescriptionService
     }
 
     async describeImage(
-        imageUrl: string
+        imageData: Buffer
     ): Promise<{ title: string; description: string }> {
-        if (!this.initialized) {
-            const model = models[this.runtime?.character?.modelProvider];
-
-            if (model === models[ModelProviderName.LLAMALOCAL]) {
-                await this.initializeLocalModel();
-            } else {
-                this.modelId = "gpt-4o-mini";
-                this.device = "cloud";
-            }
-
-            this.initialized = true;
+        if (!this.model || !this.processor || !this.tokenizer) {
+            throw new Error("Model components not initialized");
         }
 
-        if (this.device === "cloud") {
-            if (!this.runtime) {
-                throw new Error(
-                    "Runtime is required for OpenAI image recognition"
-                );
-            }
-            return this.recognizeWithOpenAI(imageUrl);
-        }
+        const base64Data = imageData.toString("base64");
+        const dataUrl = `data:image/jpeg;base64,${base64Data}`;
+        const image = await RawImage.fromURL(dataUrl);
+        const visionInputs = await this.processor(image);
+        const prompts = this.processor.construct_prompts("<DETAILED_CAPTION>");
+        const textInputs = this.tokenizer(prompts);
 
-        this.queue.push(imageUrl);
-        this.processQueue();
+        elizaLogger.log("Generating image description");
+        const generatedIds = (await this.model.generate({
+            ...textInputs,
+            ...visionInputs,
+            max_new_tokens: 256,
+        })) as Tensor;
 
-        return new Promise((resolve, _reject) => {
-            const checkQueue = () => {
-                const index = this.queue.indexOf(imageUrl);
-                if (index !== -1) {
-                    setTimeout(checkQueue, 100);
-                } else {
-                    resolve(this.processImage(imageUrl));
-                }
-            };
-            checkQueue();
+        const generatedText = this.tokenizer.batch_decode(generatedIds, {
+            skip_special_tokens: false,
+        })[0];
+
+        const result = this.processor.post_process_generation(
+            generatedText,
+            "<DETAILED_CAPTION>",
+            image.size
+        );
+
+        const detailedCaption = result["<DETAILED_CAPTION>"] as string;
+        return { title: detailedCaption, description: detailedCaption };
+    }
+}
+
+class OpenAIImageProvider implements ImageProvider {
+    constructor(private runtime: IAgentRuntime) {}
+
+    async initialize(): Promise<void> {}
+
+    async describeImage(
+        imageData: Buffer,
+        mimeType: string
+    ): Promise<{ title: string; description: string }> {
+        const imageUrl = convertToBase64DataUrl(imageData, mimeType);
+
+        const content = [
+            { type: "text", text: IMAGE_DESCRIPTION_PROMPT },
+            { type: "image_url", image_url: { url: imageUrl } },
+        ];
+
+        const endpoint =
+            this.runtime.imageVisionModelProvider === ModelProviderName.OPENAI
+                ? getEndpoint(this.runtime.imageVisionModelProvider)
+                : "https://aihubmix.com/v1";
+
+        const response = await fetch(endpoint + "/chat/completions", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${this.runtime.getSetting("OPENAI_API_KEY")}`,
+            },
+            body: JSON.stringify({
+                model: "gpt-4o-mini",
+                messages: [{ role: "user", content }],
+                max_tokens: 500,
+            }),
         });
+
+        if (!response.ok) {
+            await handleApiError(response, "OpenAI");
+        }
+
+        const data = await response.json();
+        return parseImageResponse(data.choices[0].message.content);
+    }
+}
+
+class GoogleImageProvider implements ImageProvider {
+    constructor(private runtime: IAgentRuntime) {}
+
+    async initialize(): Promise<void> {}
+
+    async describeImage(
+        imageData: Buffer,
+        mimeType: string
+    ): Promise<{ title: string; description: string }> {
+        const endpoint = getEndpoint(ModelProviderName.GOOGLE);
+        const apiKey = this.runtime.getSetting("GOOGLE_GENERATIVE_AI_API_KEY");
+
+        const response = await fetch(
+            `${endpoint}/v1/models/gemini-1.5-pro:generateContent?key=${apiKey}`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    contents: [
+                        {
+                            parts: [
+                                { text: IMAGE_DESCRIPTION_PROMPT },
+                                {
+                                    inline_data: {
+                                        mime_type: mimeType,
+                                        data: imageData.toString("base64"),
+                                    },
+                                },
+                            ],
+                        },
+                    ],
+                }),
+            }
+        );
+
+        if (!response.ok) {
+            await handleApiError(response, "Google Gemini");
+        }
+
+        const data = await response.json();
+        return parseImageResponse(data.candidates[0].content.parts[0].text);
+    }
+}
+
+export class ImageDescriptionService
+    extends Service
+    implements IImageDescriptionService
+{
+    static serviceType: ServiceType = ServiceType.IMAGE_DESCRIPTION;
+
+    private initialized: boolean = false;
+    private runtime: IAgentRuntime | null = null;
+    private provider: ImageProvider | null = null;
+
+    getInstance(): IImageDescriptionService {
+        return ImageDescriptionService.getInstance();
     }
 
-    private async recognizeWithOpenAI(
-        imageUrl: string
-    ): Promise<{ title: string; description: string }> {
-        const isGif = imageUrl.toLowerCase().endsWith(".gif");
-        let imageData: Buffer | null = null;
+    async initialize(runtime: IAgentRuntime): Promise<void> {
+        elizaLogger.log("Initializing ImageDescriptionService");
+        this.runtime = runtime;
+    }
 
-        try {
-            if (isGif) {
-                const { filePath } =
-                    await this.extractFirstFrameFromGif(imageUrl);
-                imageData = fs.readFileSync(filePath);
+    private async initializeProvider(): Promise<void> {
+        if (!this.runtime) {
+            throw new Error("Runtime is required for image recognition");
+        }
+
+        const model = models[this.runtime?.character?.modelProvider];
+
+        if (this.runtime.imageVisionModelProvider) {
+            if (
+                this.runtime.imageVisionModelProvider ===
+                ModelProviderName.LLAMALOCAL
+            ) {
+                this.provider = new LocalImageProvider();
+                elizaLogger.debug("Using llama local for vision model");
+            } else if (
+                this.runtime.imageVisionModelProvider ===
+                ModelProviderName.GOOGLE
+            ) {
+                this.provider = new GoogleImageProvider(this.runtime);
+                elizaLogger.debug("Using google for vision model");
+            } else if (
+                this.runtime.imageVisionModelProvider ===
+                ModelProviderName.OPENAI
+            ) {
+                this.provider = new OpenAIImageProvider(this.runtime);
+                elizaLogger.debug("Using openai for vision model");
+            } else {
+                elizaLogger.error(
+                    `Unsupported image vision model provider: ${this.runtime.imageVisionModelProvider}`
+                );
+            }
+        } else if (model === models[ModelProviderName.LLAMALOCAL]) {
+            this.provider = new LocalImageProvider();
+            elizaLogger.debug("Using llama local for vision model");
+        } else if (model === models[ModelProviderName.GOOGLE]) {
+            this.provider = new GoogleImageProvider(this.runtime);
+            elizaLogger.debug("Using google for vision model");
+        } else {
+            elizaLogger.debug("Using default openai for vision model");
+            this.provider = new OpenAIImageProvider(this.runtime);
+        }
+
+        await this.provider.initialize();
+        this.initialized = true;
+    }
+
+    private async loadImageData(
+        imageUrl: string
+    ): Promise<{ data: Buffer; mimeType: string }> {
+        const isGif = imageUrl.toLowerCase().endsWith(".gif");
+        let imageData: Buffer;
+        let mimeType: string;
+
+        if (isGif) {
+            const { filePath } = await this.extractFirstFrameFromGif(imageUrl);
+            imageData = fs.readFileSync(filePath);
+            mimeType = "image/png";
+            fs.unlinkSync(filePath); // Clean up temp file
+        } else {
+            if (fs.existsSync(imageUrl)) {
+                imageData = fs.readFileSync(imageUrl);
+                const ext = path.extname(imageUrl).slice(1);
+                mimeType = ext ? `image/${ext}` : "image/jpeg";
             } else {
                 const response = await fetch(imageUrl);
                 if (!response.ok) {
@@ -149,151 +325,15 @@ export class ImageDescriptionService
                     );
                 }
                 imageData = Buffer.from(await response.arrayBuffer());
-            }
-
-            if (!imageData || imageData.length === 0) {
-                throw new Error("Failed to fetch image data");
-            }
-
-            const prompt =
-                "Describe this image and give it a title. The first line should be the title, and then a line break, then a detailed description of the image. Respond with the format 'title\ndescription'";
-            const text = await this.requestOpenAI(
-                imageUrl,
-                imageData,
-                prompt,
-                isGif
-            );
-
-            const [title, ...descriptionParts] = text.split("\n");
-            return {
-                title,
-                description: descriptionParts.join("\n"),
-            };
-        } catch (error) {
-            elizaLogger.error("Error in recognizeWithOpenAI:", error);
-            throw error;
-        }
-    }
-
-    private async requestOpenAI(
-        imageUrl: string,
-        imageData: Buffer,
-        prompt: string,
-        isGif: boolean
-    ): Promise<string> {
-        for (let attempt = 0; attempt < 3; attempt++) {
-            try {
-                const content = [
-                    { type: "text", text: prompt },
-                    {
-                        type: "image_url",
-                        image_url: {
-                            url: isGif
-                                ? `data:image/png;base64,${imageData.toString("base64")}`
-                                : imageUrl,
-                        },
-                    },
-                ];
-
-                const endpoint =
-                    models[this.runtime.imageModelProvider].endpoint ??
-                    "https://api.openai.com/v1";
-
-                const response = await fetch(endpoint + "/chat/completions", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${this.runtime.getSetting("OPENAI_API_KEY")}`,
-                    },
-                    body: JSON.stringify({
-                        model: "gpt-4o-mini",
-                        messages: [{ role: "user", content }],
-                        max_tokens: isGif ? 500 : 300,
-                    }),
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const data = await response.json();
-                return data.choices[0].message.content;
-            } catch (error) {
-                elizaLogger.error(
-                    `OpenAI request failed (attempt ${attempt + 1}):`,
-                    error
-                );
-                if (attempt === 2) throw error;
+                mimeType = response.headers.get("content-type") || "image/jpeg";
             }
         }
-        throw new Error(
-            "Failed to recognize image with OpenAI after 3 attempts"
-        );
-    }
 
-    private async processQueue(): Promise<void> {
-        if (this.processing || this.queue.length === 0) return;
-
-        this.processing = true;
-        while (this.queue.length > 0) {
-            const imageUrl = this.queue.shift();
-            await this.processImage(imageUrl);
-        }
-        this.processing = false;
-    }
-
-    private async processImage(
-        imageUrl: string
-    ): Promise<{ title: string; description: string }> {
-        if (!this.model || !this.processor || !this.tokenizer) {
-            throw new Error("Model components not initialized");
+        if (!imageData || imageData.length === 0) {
+            throw new Error("Failed to fetch image data");
         }
 
-        elizaLogger.log("Processing image:", imageUrl);
-        const isGif = imageUrl.toLowerCase().endsWith(".gif");
-        let imageToProcess = imageUrl;
-
-        try {
-            if (isGif) {
-                elizaLogger.log("Extracting first frame from GIF");
-                const { filePath } =
-                    await this.extractFirstFrameFromGif(imageUrl);
-                imageToProcess = filePath;
-            }
-
-            const image = await RawImage.fromURL(imageToProcess);
-            const visionInputs = await this.processor(image);
-            const prompts =
-                this.processor.construct_prompts("<DETAILED_CAPTION>");
-            const textInputs = this.tokenizer(prompts);
-
-            elizaLogger.log("Generating image description");
-            const generatedIds = (await this.model.generate({
-                ...textInputs,
-                ...visionInputs,
-                max_new_tokens: 256,
-            })) as Tensor;
-
-            const generatedText = this.tokenizer.batch_decode(generatedIds, {
-                skip_special_tokens: false,
-            })[0];
-
-            const result = this.processor.post_process_generation(
-                generatedText,
-                "<DETAILED_CAPTION>",
-                image.size
-            );
-
-            const detailedCaption = result["<DETAILED_CAPTION>"] as string;
-            return { title: detailedCaption, description: detailedCaption };
-        } catch (error) {
-            elizaLogger.error("Error processing image:", error);
-            throw error;
-        } finally {
-            if (isGif && imageToProcess !== imageUrl) {
-                fs.unlinkSync(imageToProcess);
-            }
-        }
+        return { data: imageData, mimeType };
     }
 
     private async extractFirstFrameFromGif(
@@ -316,6 +356,22 @@ export class ImageDescriptionService
             writeStream.on("finish", () => resolve({ filePath: tempFilePath }));
             writeStream.on("error", reject);
         });
+    }
+
+    async describeImage(
+        imageUrl: string
+    ): Promise<{ title: string; description: string }> {
+        if (!this.initialized) {
+            await this.initializeProvider();
+        }
+
+        try {
+            const { data, mimeType } = await this.loadImageData(imageUrl);
+            return await this.provider!.describeImage(data, mimeType);
+        } catch (error) {
+            elizaLogger.error("Error in describeImage:", error);
+            throw error;
+        }
     }
 }
 

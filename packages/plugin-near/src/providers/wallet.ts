@@ -1,4 +1,10 @@
-import { IAgentRuntime, Memory, Provider, State } from "@elizaos/core";
+import {
+    IAgentRuntime,
+    Memory,
+    Provider,
+    State,
+    elizaLogger,
+} from "@elizaos/core";
 import { KeyPair, keyStores, connect, Account, utils } from "near-api-js";
 import BigNumber from "bignumber.js";
 import { KeyPairString } from "near-api-js/lib/utils";
@@ -7,14 +13,14 @@ import NodeCache from "node-cache";
 const PROVIDER_CONFIG = {
     networkId: process.env.NEAR_NETWORK || "testnet",
     nodeUrl:
-        process.env.RPC_URL ||
+        process.env.NEAR_RPC_URL ||
         `https://rpc.${process.env.NEAR_NETWORK || "testnet"}.near.org`,
     walletUrl: `https://${process.env.NEAR_NETWORK || "testnet"}.mynearwallet.com/`,
     helperUrl: `https://helper.${process.env.NEAR_NETWORK || "testnet"}.near.org`,
     explorerUrl: `https://${process.env.NEAR_NETWORK || "testnet"}.nearblocks.io`,
     MAX_RETRIES: 3,
     RETRY_DELAY: 2000,
-    SLIPPAGE: process.env.SLIPPAGE ? parseInt(process.env.SLIPPAGE) : 1,
+    SLIPPAGE: process.env.NEAR_SLIPPAGE ? parseInt(process.env.NEAR_SLIPPAGE) : 1,
 };
 
 export interface NearToken {
@@ -51,7 +57,7 @@ export class WalletProvider implements Provider {
         try {
             return await this.getFormattedPortfolio(runtime);
         } catch (error) {
-            console.error("Error in wallet provider:", error);
+            elizaLogger.error("Error in wallet provider:", error);
             return null;
         }
     }
@@ -102,7 +108,7 @@ export class WalletProvider implements Provider {
                 }
                 return await response.json();
             } catch (error) {
-                console.error(`Attempt ${i + 1} failed:`, error);
+                elizaLogger.error(`Attempt ${i + 1} failed:`, error);
                 lastError = error as Error;
                 if (i < PROVIDER_CONFIG.MAX_RETRIES - 1) {
                     await new Promise((resolve) =>
@@ -125,7 +131,7 @@ export class WalletProvider implements Provider {
             const cachedValue = this.cache.get<WalletPortfolio>(cacheKey);
 
             if (cachedValue) {
-                console.log("Cache hit for fetchPortfolioValue");
+                elizaLogger.log("Cache hit for fetchPortfolioValue");
                 return cachedValue;
             }
 
@@ -160,7 +166,7 @@ export class WalletProvider implements Provider {
             this.cache.set(cacheKey, portfolio);
             return portfolio;
         } catch (error) {
-            console.error("Error fetching portfolio:", error);
+            elizaLogger.error("Error fetching portfolio:", error);
             throw error;
         }
     }
@@ -181,7 +187,7 @@ export class WalletProvider implements Provider {
             this.cache.set(cacheKey, price);
             return price;
         } catch (error) {
-            console.error("Error fetching NEAR price:", error);
+            elizaLogger.error("Error fetching NEAR price:", error);
             return 0;
         }
     }
@@ -214,7 +220,7 @@ export class WalletProvider implements Provider {
             const portfolio = await this.fetchPortfolioValue(runtime);
             return this.formatPortfolio(runtime, portfolio);
         } catch (error) {
-            console.error("Error generating portfolio report:", error);
+            elizaLogger.error("Error generating portfolio report:", error);
             return "Unable to fetch wallet information. Please try again later.";
         }
     }
@@ -234,7 +240,7 @@ const walletProvider: Provider = {
             const provider = new WalletProvider(accountId);
             return await provider.getFormattedPortfolio(runtime);
         } catch (error) {
-            console.error("Error in wallet provider:", error);
+            elizaLogger.error("Error in wallet provider:", error);
             return null;
         }
     },

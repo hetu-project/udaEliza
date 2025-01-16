@@ -119,4 +119,4 @@ const walletProvider: Provider = {
     },
 };
 
-export { walletProvider };
+export { walletProvider, TokenBalances };

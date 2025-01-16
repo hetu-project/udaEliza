@@ -1,4 +1,4 @@
-name: integration-test
+name: Integration Tests
 on:
     push:
         branches:
@@ -6,23 +6,8 @@ on:
     pull_request:
         branches:
             - "*"
+
 jobs:
-    smoke-tests:
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v4
-
-            - uses: pnpm/action-setup@v3
-              with:
-                  version: 9.4.0
-
-            - uses: actions/setup-node@v4
-              with:
-                  node-version: "23"
-                  cache: "pnpm"
-
-            - name: Run smoke tests
-              run: pnpm run smokeTests
     integration-tests:
         runs-on: ubuntu-latest
         env:
@@ -32,34 +17,25 @@ jobs:
 
             - uses: pnpm/action-setup@v3
               with:
-                  version: 9.4.0
+                  version: 9.15.0
 
             - uses: actions/setup-node@v4
               with:
-                  node-version: "23"
+                  node-version: "23.3.0"
                   cache: "pnpm"
 
+            - name: Clean up
+              run: pnpm clean
+
             - name: Install dependencies
-              run: pnpm install -r
+              run: pnpm install -r --no-frozen-lockfile
 
             - name: Build packages
               run: pnpm build
 
-            - name: Check for API key
-              id: check_api_key
-              run: |
-                  if [ -z "$OPENAI_API_KEY" ]; then
-                    echo "::set-output name=api_key_present::false"
-                  else
-                    echo "::set-output name=api_key_present::true"
-                  fi
-
             - name: Run integration tests
-              if: steps.check_api_key.outputs.api_key_present == 'true'
-              run: pnpm run integrationTests
-
-            - name: Skip integration tests
-              if: steps.check_api_key.outputs.api_key_present == 'false'
+              env:
+                  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+                  COINBASE_COMMERCE_KEY: ${{ secrets.COINBASE_COMMERCE_KEY }}
               run: |
-                  echo "Skipping integration tests due to missing required API keys"
-                  exit 1
+                  pnpm run integrationTests

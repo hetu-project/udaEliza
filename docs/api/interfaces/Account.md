@@ -1,4 +1,4 @@
-[@elizaos/core v0.1.6-alpha.4](../index.md) / Account
+[@elizaos/core v0.1.7](../index.md) / Account
 
 # Interface: Account
 
@@ -14,7 +14,7 @@ Unique identifier
 
 #### Defined in
 
-[packages/core/src/types.ts:505](https://github.com/elizaos/eliza/blob/main/packages/core/src/types.ts#L505)
+[packages/core/src/types.ts:513](https://github.com/elizaOS/eliza/blob/main/packages/core/src/types.ts#L513)
 
 ---
 
@@ -26,7 +26,7 @@ Display name
 
 #### Defined in
 
-[packages/core/src/types.ts:508](https://github.com/elizaos/eliza/blob/main/packages/core/src/types.ts#L508)
+[packages/core/src/types.ts:516](https://github.com/elizaOS/eliza/blob/main/packages/core/src/types.ts#L516)
 
 ---
 
@@ -38,7 +38,7 @@ Username
 
 #### Defined in
 
-[packages/core/src/types.ts:511](https://github.com/elizaos/eliza/blob/main/packages/core/src/types.ts#L511)
+[packages/core/src/types.ts:519](https://github.com/elizaOS/eliza/blob/main/packages/core/src/types.ts#L519)
 
 ---
 
@@ -54,7 +54,7 @@ Optional additional details
 
 #### Defined in
 
-[packages/core/src/types.ts:514](https://github.com/elizaos/eliza/blob/main/packages/core/src/types.ts#L514)
+[packages/core/src/types.ts:522](https://github.com/elizaOS/eliza/blob/main/packages/core/src/types.ts#L522)
 
 ---
 
@@ -66,7 +66,7 @@ Optional email
 
 #### Defined in
 
-[packages/core/src/types.ts:517](https://github.com/elizaos/eliza/blob/main/packages/core/src/types.ts#L517)
+[packages/core/src/types.ts:525](https://github.com/elizaOS/eliza/blob/main/packages/core/src/types.ts#L525)
 
 ---
 
@@ -78,4 +78,4 @@ Optional avatar URL
 
 #### Defined in
 
-[packages/core/src/types.ts:520](https://github.com/elizaos/eliza/blob/main/packages/core/src/types.ts#L520)
+[packages/core/src/types.ts:528](https://github.com/elizaOS/eliza/blob/main/packages/core/src/types.ts#L528)

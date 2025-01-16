@@ -1,4 +1,12 @@
-import { describe, it, expect, beforeAll, beforeEach } from "vitest";
+import {
+    describe,
+    it,
+    expect,
+    beforeAll,
+    beforeEach,
+    vi,
+    afterEach,
+} from "vitest";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { mainnet, iotex, arbitrum, Chain } from "viem/chains";
 
@@ -8,6 +16,12 @@ const customRpcUrls = {
     mainnet: "custom-rpc.mainnet.io",
     arbitrum: "custom-rpc.base.io",
     iotex: "custom-rpc.iotex.io",
+};
+
+// Mock the ICacheManager
+const mockCacheManager = {
+    get: vi.fn().mockResolvedValue(null),
+    set: vi.fn(),
 };
 
 describe("Wallet provider", () => {
@@ -25,36 +39,53 @@ describe("Wallet provider", () => {
         );
     });
 
+    afterEach(() => {
+        vi.clearAllTimers();
+    });
+
+    beforeEach(() => {
+        vi.clearAllMocks();
+        mockCacheManager.get.mockResolvedValue(null);
+    });
+
     describe("Constructor", () => {
         it("sets address", () => {
             const account = privateKeyToAccount(pk);
             const expectedAddress = account.address;
 
-            walletProvider = new WalletProvider(pk);
+            walletProvider = new WalletProvider(pk, mockCacheManager as any);
 
             expect(walletProvider.getAddress()).toEqual(expectedAddress);
         });
         it("sets default chain to ethereum mainnet", () => {
-            walletProvider = new WalletProvider(pk);
+            walletProvider = new WalletProvider(pk, mockCacheManager as any);
 
             expect(walletProvider.chains.mainnet.id).toEqual(mainnet.id);
             expect(walletProvider.getCurrentChain().id).toEqual(mainnet.id);
         });
         it("sets custom chains", () => {
-            walletProvider = new WalletProvider(pk, customChains);
+            walletProvider = new WalletProvider(
+                pk,
+                mockCacheManager as any,
+                customChains
+            );
 
             expect(walletProvider.chains.iotex.id).toEqual(iotex.id);
             expect(walletProvider.chains.arbitrum.id).toEqual(arbitrum.id);
         });
         it("sets the first provided custom chain as current chain", () => {
-            walletProvider = new WalletProvider(pk, customChains);
+            walletProvider = new WalletProvider(
+                pk,
+                mockCacheManager as any,
+                customChains
+            );
 
             expect(walletProvider.getCurrentChain().id).toEqual(iotex.id);
         });
     });
     describe("Clients", () => {
         beforeEach(() => {
-            walletProvider = new WalletProvider(pk);
+            walletProvider = new WalletProvider(pk, mockCacheManager as any);
         });
         it("generates public client", () => {
             const client = walletProvider.getPublicClient("mainnet");
@@ -68,7 +99,9 @@ describe("Wallet provider", () => {
                 "mainnet",
                 customRpcUrls.mainnet
             );
-            const wp = new WalletProvider(pk, { ["mainnet"]: chain });
+            const wp = new WalletProvider(pk, mockCacheManager as any, {
+                ["mainnet"]: chain,
+            });
 
             const client = wp.getPublicClient("mainnet");
             expect(client.chain.id).toEqual(mainnet.id);
@@ -98,7 +131,9 @@ describe("Wallet provider", () => {
                 "mainnet",
                 customRpcUrls.mainnet
             );
-            const wp = new WalletProvider(pk, { ["mainnet"]: chain });
+            const wp = new WalletProvider(pk, mockCacheManager as any, {
+                ["mainnet"]: chain,
+            });
 
             const client = wp.getWalletClient("mainnet");
 
@@ -115,7 +150,11 @@ describe("Wallet provider", () => {
     });
     describe("Balance", () => {
         beforeEach(() => {
-            walletProvider = new WalletProvider(pk, customChains);
+            walletProvider = new WalletProvider(
+                pk,
+                mockCacheManager as any,
+                customChains
+            );
         });
         it("should fetch balance", async () => {
             const bal = await walletProvider.getWalletBalance();
@@ -134,7 +173,11 @@ describe("Wallet provider", () => {
     });
     describe("Chain", () => {
         beforeEach(() => {
-            walletProvider = new WalletProvider(pk, customChains);
+            walletProvider = new WalletProvider(
+                pk,
+                mockCacheManager as any,
+                customChains
+            );
         });
         it("generates chains from chain name", () => {
             const chainName = "iotex";

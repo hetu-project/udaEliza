@@ -10,7 +10,9 @@ import type {
 } from "viem";
 import * as viemChains from "viem/chains";
 
-const _SupportedChainList = Object.keys(viemChains) as Array<keyof typeof viemChains>;
+const _SupportedChainList = Object.keys(viemChains) as Array<
+    keyof typeof viemChains
+>;
 export type SupportedChain = (typeof _SupportedChainList)[number];
 
 // Transaction types
@@ -88,6 +90,7 @@ export interface BridgeParams {
 export interface EvmPluginConfig {
     rpcUrl?: {
         ethereum?: string;
+        abstract?: string;
         base?: string;
         sepolia?: string;
         bsc?: string;
@@ -98,6 +101,7 @@ export interface EvmPluginConfig {
         cronos?: string;
         gnosis?: string;
         fantom?: string;
+        fraxtal?: string;
         klaytn?: string;
         celo?: string;
         moonbeam?: string;
@@ -112,6 +116,7 @@ export interface EvmPluginConfig {
         taiko?: string;
         zksync?: string;
         canto?: string;
+        alienx?: string;
     };
     secrets?: {
         EVM_PRIVATE_KEY: string;

@@ -1,4 +1,4 @@
-[@elizaos/core v0.1.6-alpha.4](../index.md) / Model
+[@elizaos/core v0.1.7](../index.md) / Model
 
 # Type Alias: Model
 
@@ -62,6 +62,12 @@ Stop sequences
 
 Temperature setting
 
+### settings.experimental_telemetry?
+
+> `optional` **experimental_telemetry**: [`TelemetrySettings`](TelemetrySettings.md)
+
+Optional telemetry configuration (experimental)
+
 ### imageSettings?
 
 > `optional` **imageSettings**: `object`
@@ -100,4 +106,4 @@ Model names by size class
 
 ## Defined in
 
-[packages/core/src/types.ts:142](https://github.com/elizaos/eliza/blob/main/packages/core/src/types.ts#L142)
+[packages/core/src/types.ts:142](https://github.com/elizaOS/eliza/blob/main/packages/core/src/types.ts#L142)

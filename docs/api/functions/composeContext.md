@@ -1,8 +1,8 @@
-[@elizaos/core v0.1.6-alpha.4](../index.md) / composeContext
+[@elizaos/core v0.1.7](../index.md) / composeContext
 
 # Function: composeContext()
 
-> **composeContext**(`params`): `any`
+> **composeContext**(`params`): `string`
 
 Composes a context string by replacing placeholders in a template with corresponding values from the state.
 
@@ -20,11 +20,11 @@ The parameters for composing the context.
 
 • **params.state**: [`State`](../interfaces/State.md)
 
-The state object containing values to replace the placeholders in the template.
+The state object contains values to replace the placeholders in the template.
 
-• **params.template**: `string`
+• **params.template**: `string` | `Function`
 
-The template string containing placeholders to be replaced with state values.
+The template string or function returning a string containing placeholders to be replaced with state values.
 
 • **params.templatingEngine?**: `"handlebars"`
 
@@ -32,7 +32,7 @@ The templating engine to use for compiling and evaluating the template (optional
 
 ## Returns
 
-`any`
+`string`
 
 The composed context string with placeholders replaced by corresponding state values.
 
@@ -50,4 +50,4 @@ const contextSimple = composeContext({ state, template });
 
 ## Defined in
 
-[packages/core/src/context.ts:28](https://github.com/elizaos/eliza/blob/main/packages/core/src/context.ts#L28)
+[packages/core/src/context.ts:29](https://github.com/elizaOS/eliza/blob/main/packages/core/src/context.ts#L29)

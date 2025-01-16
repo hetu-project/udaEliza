@@ -1,4 +1,4 @@
-[@elizaos/core v0.1.6-alpha.4](../index.md) / Models
+[@elizaos/core v0.1.7](../index.md) / Models
 
 # Type Alias: Models
 
@@ -100,6 +100,10 @@ Model configurations by provider
 
 > **akash_chat_api**: [`Model`](Model.md)
 
+### livepeer
+
+> **livepeer**: [`Model`](Model.md)
+
 ## Defined in
 
-[packages/core/src/types.ts:188](https://github.com/elizaos/eliza/blob/main/packages/core/src/types.ts#L188)
+[packages/core/src/types.ts:191](https://github.com/elizaOS/eliza/blob/main/packages/core/src/types.ts#L191)

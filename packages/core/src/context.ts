@@ -1,5 +1,6 @@
 import handlebars from "handlebars";
-import { type State } from "./types.ts";
+import { type State, type TemplateType } from "./types.ts";
+import { names, uniqueNamesGenerator } from "unique-names-generator";
 
 /**
  * Composes a context string by replacing placeholders in a template with corresponding values from the state.
@@ -12,7 +13,7 @@ import { type State } from "./types.ts";
  *
  * @param {Object} params - The parameters for composing the context.
  * @param {State} params.state - The state object containing values to replace the placeholders in the template.
- * @param {string} params.template - The template string containing placeholders to be replaced with state values.
+ * @param {TemplateType} params.template - The template string or function containing placeholders to be replaced with state values.
  * @param {"handlebars" | undefined} [params.templatingEngine] - The templating engine to use for compiling and evaluating the template (optional, default: `undefined`).
  * @returns {string} The composed context string with placeholders replaced by corresponding state values.
  *
@@ -24,23 +25,34 @@ import { type State } from "./types.ts";
  * // Composing the context with simple string replacement will result in:
  * // "Hello, Alice! You are 30 years old."
  * const contextSimple = composeContext({ state, template });
+ *
+ * // Using composeContext with a template function for dynamic template
+ * const template = ({ state }) => {
+ * const tone = Math.random() > 0.5 ? "kind" : "rude";
+ *   return `Hello, {{userName}}! You are {{userAge}} years old. Be ${tone}`;
+ * };
+ * const contextSimple = composeContext({ state, template });
  */
+
 export const composeContext = ({
     state,
     template,
     templatingEngine,
 }: {
     state: State;
-    template: string;
+    template: TemplateType;
     templatingEngine?: "handlebars";
 }) => {
+    const templateStr =
+        typeof template === "function" ? template({ state }) : template;
+
     if (templatingEngine === "handlebars") {
-        const templateFunction = handlebars.compile(template);
+        const templateFunction = handlebars.compile(templateStr);
         return templateFunction(state);
     }
 
     // @ts-expect-error match isn't working as expected
-    const out = template.replace(/{{\w+}}/g, (match) => {
+    const out = templateStr.replace(/{{\w+}}/g, (match) => {
         const key = match.replace(/{{|}}/g, "");
         return state[key] ?? "";
     });
@@ -68,4 +80,36 @@ export const composeContext = ({
  */
 export const addHeader = (header: string, body: string) => {
     return body.length > 0 ? `${header ? header + "\n" : header}${body}\n` : "";
+};
+
+/**
+ * Generates a string with random user names populated in a template.
+ *
+ * This function generates a specified number of random user names and populates placeholders
+ * in the provided template with these names. Placeholders in the template should follow the format `{{userX}}`
+ * where `X` is the position of the user (e.g., `{{user1}}`, `{{user2}}`).
+ *
+ * @param {string} params.template - The template string containing placeholders for random user names.
+ * @param {number} params.length - The number of random user names to generate.
+ * @returns {string} The template string with placeholders replaced by random user names.
+ *
+ * @example
+ * // Given a template and a length
+ * const template = "Hello, {{user1}}! Meet {{user2}} and {{user3}}.";
+ * const length = 3;
+ *
+ * // Composing the random user string will result in:
+ * // "Hello, John! Meet Alice and Bob."
+ * const result = composeRandomUser({ template, length });
+ */
+export const composeRandomUser = (template: string, length: number) => {
+    const exampleNames = Array.from({ length }, () =>
+        uniqueNamesGenerator({ dictionaries: [names] })
+    );
+    let result = template;
+    for (let i = 0; i < exampleNames.length; i++) {
+        result = result.replaceAll(`{{user${i + 1}}}`, exampleNames[i]);
+    }
+
+    return result;
 };
