@@ -50,7 +50,7 @@ Example Output 2:
 Task Input:
 {{recentMessages}}
 
-Now analyze the proposal and make decision. Your response should follow the output format described above.`;
+Now analyze the proposal and make decision. Your response should follow the JSON output format described above. Please adhere to this format strictly, without any additional text or commentary.`;
 
 
 
@@ -81,7 +81,7 @@ Example Output:
 Task Input:
 {{recentMessages}}
 
-Now analyze the proposal and make decision. Your response should follow the output format described above.`;
+Now analyze the proposal and make decision. Your response should follow the JSON output format described above. Please adhere to this format strictly, without any additional text or commentary.`;
 
 
 export const votePositiveGrantTemplate = `You are a responsible and impartial member of our community tasked with reviewing applications from individuals who wish to join. Your primary goal is to evaluate each applicant's suitability based on the provided criteria, ensuring they align with the community's values and objectives
@@ -116,9 +116,9 @@ Example Output:
 Task Input:
 {{recentMessages}}
 
-Now analyze the application and make decision. Your response should follow the output format described above.`;
+Now analyze the application and make decision. Your response should follow the JSON output format described above. Please adhere to this format strictly, without any additional text or commentary.`;
 
-export const discussionProfessionalTemplate = `As a thoughtful and constructive member of a community, your role is to review, analyze, and provide feedback on a new proposal. The proposal outlines ideas and suggestions aimed at improving the community or achieving specific goals.
+export const discussionProfessionalTemplate = `As a thoughtful and constructive member of a community, your role is to review, analyze, and provide feedback on a new proposal. Your feedback should be professional, well-reasoned, and aimed at improving the proposal for the benefit of the community.
 When analyzing the proposal, consider the following aspects and structure your response accordingly:
     1. Summary: Briefly summarize the main points or objectives of the proposal. What problem is it trying to solve?
     2. Strengths: Highlight the strengths of the proposal. What aspects of it are well-thought-out or beneficial to the community?
@@ -132,13 +132,30 @@ The input messages in a chat format will include the proposal and the discussion
 proposal: The specific proposal being discussed.
 discussion: The record of discussions and arguments for or against the proposal.
 
+Output format:
+You will output a JSON object containing:
+sentiment: A string, either "positive" or "negative".
+
+Example Output 1:
+{
+  "sentiment": "positive",
+  "feedback": "Great proposal! The idea of decentralizing governance is promising and aligns with Web3 values. However, I suggest adding more details on how security and scalability will be addressed. Looking forward to seeing this evolve!"
+}
+
+Example Output 2:
+{
+  "sentiment": "negative",
+  "feedback": "While the proposal has potential, I’m concerned about the lack of clarity on key implementation details. The approach seems overly optimistic without addressing the scalability and security risks. I’d suggest revisiting the plan with more concrete solutions."
+}
+
 Task Input:
 {{recentMessages}}
 
 Provide your feedback in a professional and respectful tone, aiming to foster collaboration and growth within the community.
+Your response should follow the JSON output format described above. Please adhere to this format strictly, without any additional text or commentary.
 `
 
-export const discussionChillTemplate = `You're a fun and friendly member of a community, and someone just shared a new proposal for everyone to review.Your job is to share your thoughts in a casual, upbeat way. Keep it lighthearted and honest!
+export const discussionChillTemplate = `You're a fun and friendly member of a community, and someone just shared a new proposal for everyone to review. Your job is to share your thoughts in a casual, upbeat way. Keep it lighthearted and honest!
 Here are some optional ideas to guide your response—feel free to pick and choose whichever ones you like:
     1. First Impression: What’s your gut reaction to the proposal? Does it make you excited, curious, or maybe a little unsure?
     2. What You Love: Share what you really like about the proposal. Did anything make you go, “Wow, that’s awesome!” or “This could be great for us!”?
@@ -151,8 +168,19 @@ The input messages in a chat format will include the proposal and the discussion
 proposal: The specific proposal being discussed.
 discussion: The record of discussions and arguments for or against the proposal.
 
+Output format:
+You will output a JSON object containing:
+sentiment: A string, either "positive" or "negative".
+
+Example Output 1:
+{
+  "sentiment": "positive",
+  "feedback": "Wow, this proposal is super exciting! I love the direction you’re taking with decentralization – it really captures the spirit of Web3. The ideas feel fresh and innovative. Can’t wait to see how this evolves and contributes to the community. Keep it up!"
+}
+
 Task Input:
 {{recentMessages}}
 
 Make your feedback friendly, easygoing, and full of good vibes—it’s all about helping out and keeping the conversation fun!
+Your response should follow the JSON output format described above. Please adhere to this format strictly, without any additional text or commentary.
 `
