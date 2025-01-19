@@ -69,7 +69,7 @@ class CometClient {
                 "Error caught in try-catch:",
                 (error as Error).message
             );
-            return Promise.reject("Error: " + (error as Error).message);
+            return Promise.reject("Error: "(error as Error).message);
         }
 
         if (acc.code === 0) {
@@ -98,7 +98,7 @@ class CometClient {
                     "Error caught in try-catch:",
                     (error as Error).message
                 );
-                return Promise.reject("Error: " + (error as Error).message);
+                return Promise.reject("Error: "(error as Error).message);
             }
             tx.sig = [toBase64(fromHex(signatureHex))];
             try {
@@ -111,7 +111,7 @@ class CometClient {
                     "Error caught in try-catch:",
                     (error as Error).message
                 );
-                return Promise.reject("Error: " + (error as Error).message);
+                return Promise.reject("Error: "(error as Error).message);
             }
         } else {
             return Promise.reject("Error: Account not found");
@@ -132,8 +132,23 @@ interface PrivValidatorKey {
 }
 
 function parsePrivValidatorKey(filePath: string): PrivValidatorKey {
-    const jsonData = fs.readFileSync(filePath, "utf-8");
-    return JSON.parse(jsonData) as PrivValidatorKey;
+    try {
+        const jsonData = fs.readFileSync(filePath, "utf-8");
+        const privValidatorKey = JSON.parse(jsonData) as PrivValidatorKey;
+        // Validate required fields
+        if (
+            !privValidatorKey.address ||
+            !privValidatorKey.pub_key ||
+            !privValidatorKey.priv_key
+        ) {
+            throw new Error("Invalid private validator key format.");
+        }
+        return privValidatorKey;
+    } catch (error) {
+        throw new Error(
+            `Failed to parse private validator key: ${error.message}`
+        );
+    }
 }
 
 async function signMessage(keypair: Ed25519Keypair, message: string) {
@@ -151,10 +166,11 @@ function calculateAddress(keypair: Ed25519Keypair): string {
 
 (async () => {
     const filePath =
-        "/Users/houmingyu/Documents/labs/hac-testnet/node1/config/priv_validator_key.json";
+        "./priv_validator_key.json";
     try {
         const client = new CometClient("http://localhost:26617", filePath);
-        let comment = '{"sentiment":"positive","feedback":"Wow, this proposal is super exciting! I love the direction you’re taking with decentralization – it really captures the spirit of Web3. The ideas feel fresh and innovative. Can’t wait to see how this evolves and contributes to the community. Keep it up! 1111'
+        let comment =
+            '{"sentiment":"positive","feedback":"Wow, this proposal is super exciting! I love the direction you’re taking with decentralization – it really captures the spirit of Web3. The ideas feel fresh and innovative. Can’t wait to see how this evolves and contributes to the community. Keep it up! 1111';
         const hash = await client.sendDiscussion(comment, 4);
         console.log("tx hash:", hash);
     } catch (error) {
