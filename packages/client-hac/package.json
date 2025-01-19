@@ -30,7 +30,11 @@
         "discord.js": "14.16.3",
         "express": "4.21.1",
         "multer": "1.4.5-lts.1",
-        "openai": "4.73.0"
+        "openai": "4.73.0",
+        "@cosmjs/proto-signing": "^0.32.4",
+        "@cosmjs/stargate": "^0.32.4",
+        "@cosmjs/crypto":"^0.32.4",
+        "@cosmjs/tendermint-rpc":"0.33.0"
     },
     "devDependencies": {
         "@types/multer": "^1.4.12",
@@ -39,6 +43,7 @@
     "scripts": {
         "build": "tsup --format esm --dts",
         "dev": "tsup --format esm --dts --watch",
+        "start": "tsc && node --loader ts-node/esm src/hac.ts",
         "lint": "eslint --fix  --cache ."
     },
     "peerDependencies": {

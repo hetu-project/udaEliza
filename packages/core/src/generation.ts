@@ -1310,7 +1310,7 @@ export async function generateMessageResponse({
                 elizaLogger.debug("parsedContent is null, retrying");
                 continue;
             }
-
+            parsedContent.text = response;
             return parsedContent;
         } catch (error) {
             elizaLogger.error("ERROR:", error);

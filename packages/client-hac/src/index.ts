@@ -17,12 +17,20 @@ import {
     stringToUuid,
     settings,
     IAgentRuntime,
+    getEnvVariable,
 } from "@elizaos/core";
 import { createApiRouter } from "./api.ts";
 import * as fs from "fs";
 import * as path from "path";
 import OpenAI from "openai";
-import {voteNegitiveProposalTemplate,votePositiveProposalTemplate,votePositiveGrantTemplate,discussionChillTemplate,discussionProfessionalTemplate} from "./templates.ts";
+import {
+    voteNegitiveProposalTemplate,
+    votePositiveProposalTemplate,
+    votePositiveGrantTemplate,
+    discussionChillTemplate,
+    discussionProfessionalTemplate,
+} from "./templates.ts";
+import { CometClient } from "./hac.ts";
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -109,9 +117,18 @@ export class DirectClient {
     private agents: Map<string, AgentRuntime>; // container management
     private server: any; // Store server instance
     public startAgent: Function; // Store startAgent functor
+    public cometClient: CometClient;
 
     constructor() {
         elizaLogger.log("DirectClient constructor");
+        let rpcUrl = getEnvVariable("COMET_URL", "http://127.0.0.1:26617");
+        elizaLogger.log("comet url", rpcUrl);
+        let privKeyPath = getEnvVariable(
+            "COMET_PRIVKEY",
+            "./priv_validator_key.json"
+        );
+        elizaLogger.log("privkey path", privKeyPath);
+        this.cometClient = new CometClient(rpcUrl, privKeyPath);
         this.app = express();
         this.app.use(cors());
         this.agents = new Map();
@@ -221,9 +238,12 @@ export class DirectClient {
                     "direct"
                 );
 
-                let existMemories  = await runtime.messageManager.getMemoriesByRoomIds({ roomIds: [roomId] });
+                let existMemories =
+                    await runtime.messageManager.getMemoriesByRoomIds({
+                        roomIds: [roomId],
+                    });
                 if (existMemories && existMemories.length > 0) {
-                    res.status(400).send("Proposal already exists");
+                    res.status(200).send("Proposal already exists");
                     return;
                 }
 
@@ -305,7 +325,10 @@ export class DirectClient {
                     req.body.validatorAddress,
                     "direct"
                 );
-                let existMemories  = await runtime.messageManager.getMemoriesByRoomIds({ roomIds: [roomId] });
+                let existMemories =
+                    await runtime.messageManager.getMemoriesByRoomIds({
+                        roomIds: [roomId],
+                    });
                 if (!existMemories || existMemories.length === 0) {
                     res.status(400).send("Proposal not found");
                     return;
@@ -511,7 +534,6 @@ export class DirectClient {
             }
         );
 
-
         this.app.post(
             "/:agentId/voteproposal",
             upload.single("file"),
@@ -554,7 +576,10 @@ export class DirectClient {
                     "direct"
                 );
 
-                let existMemories  = await runtime.messageManager.getMemoriesByRoomIds({ roomIds: [roomId] });
+                let existMemories =
+                    await runtime.messageManager.getMemoriesByRoomIds({
+                        roomIds: [roomId],
+                    });
                 if (!existMemories || existMemories.length === 0) {
                     res.status(400).send("Proposal not found");
                     return;
@@ -595,7 +620,6 @@ export class DirectClient {
                     modelClass: ModelClass.LARGE,
                 });
                 elizaLogger.info("response:", response);
-                console.dir(response)
 
                 if (!response) {
                     res.status(500).send(
@@ -605,16 +629,21 @@ export class DirectClient {
                 }
                 let vote = "error";
                 if (response && response.decision) {
-                    if (typeof response.decision === "string" && response.decision.includes("yes")) {
+                    if (
+                        typeof response.decision === "string" &&
+                        response.decision.includes("yes")
+                    ) {
                         vote = "yes";
-                    } else if (typeof response.decision === "string" && response.decision.includes("no")) {
+                    } else if (
+                        typeof response.decision === "string" &&
+                        response.decision.includes("no")
+                    ) {
                         vote = "no";
                     }
                 }
                 res.json({ vote });
             }
         );
-
 
         this.app.post(
             "/:agentId/newdiscussion",
@@ -658,7 +687,10 @@ export class DirectClient {
                     "direct"
                 );
 
-                let existMemories  = await runtime.messageManager.getMemoriesByRoomIds({ roomIds: [roomId] });
+                let existMemories =
+                    await runtime.messageManager.getMemoriesByRoomIds({
+                        roomIds: [roomId],
+                    });
                 if (!existMemories || existMemories.length === 0) {
                     res.status(400).send("Proposal not found");
                     return;
@@ -708,16 +740,24 @@ export class DirectClient {
                     template: discussionChillTemplate,
                 });
 
-                elizaLogger.info("context", context);
+                elizaLogger.info("new discussion context:", context);
 
                 const response = await generateMessageResponse({
                     runtime: runtime,
                     context,
                     modelClass: ModelClass.LARGE,
                 });
-                elizaLogger.info("response:", response);
-                console.dir(response)
-                res.json("ok");
+                try {
+                    let txHash = await this.cometClient.sendDiscussion(
+                        String(response.feedback),
+                        parseInt(req.body.proposalId, 10),
+                    );
+                    elizaLogger.info("discussion txHash:", txHash);
+                    response.txHash = txHash;
+                } catch (e) {
+                    elizaLogger.error("sendDiscussion error:", e);
+                }
+                res.json(response);
             }
         );
 
@@ -731,7 +771,7 @@ export class DirectClient {
                     return;
                 }
                 // roomId is grant id
-                const roomId = stringToUuid("grant-"+req.body.grantId);
+                const roomId = stringToUuid("grant-" + req.body.grantId);
                 if (!req.body.validatorAddress) {
                     res.status(400).send("No validatorAddress provided");
                     return;
@@ -810,7 +850,6 @@ export class DirectClient {
                     modelClass: ModelClass.LARGE,
                 });
                 elizaLogger.info("response:", response);
-                console.dir(response)
 
                 if (!response) {
                     res.status(500).send(
@@ -820,9 +859,15 @@ export class DirectClient {
                 }
                 let vote = "error";
                 if (response && response.decision) {
-                    if (typeof response.decision === "string" && response.decision.includes("yes")) {
+                    if (
+                        typeof response.decision === "string" &&
+                        response.decision.includes("yes")
+                    ) {
                         vote = "yes";
-                    } else if (typeof response.decision === "string" && response.decision.includes("no")) {
+                    } else if (
+                        typeof response.decision === "string" &&
+                        response.decision.includes("no")
+                    ) {
                         vote = "no";
                     }
                 }
