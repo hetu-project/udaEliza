@@ -5,7 +5,7 @@
     "type": "module",
     "scripts": {
         "build": "tsup src/index.ts --format esm --dts",
-        "start": "tsc && node --loader ts-node/esm src/index.ts --ignore-engines --character=/Users/houmingyu/Documents/labs/eliza-starter/eliza.json",
+        "start": "tsc && node --loader ts-node/esm src/index.ts --ignore-engines --character=./eliza.json",
         "check-types": "tsc --noEmit"
     },
     "nodemonConfig": {
