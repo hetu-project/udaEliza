@@ -69,7 +69,7 @@ class CometClient {
                 "Error caught in try-catch:",
                 (error as Error).message
             );
-            return Promise.reject("Error: "(error as Error).message);
+            return Promise.reject("Error: " + (error as Error).message);
         }
 
         if (acc.code === 0) {
@@ -98,7 +98,7 @@ class CometClient {
                     "Error caught in try-catch:",
                     (error as Error).message
                 );
-                return Promise.reject("Error: "(error as Error).message);
+                return Promise.reject("Error: " + (error as Error).message);
             }
             tx.sig = [toBase64(fromHex(signatureHex))];
             try {
@@ -111,7 +111,7 @@ class CometClient {
                     "Error caught in try-catch:",
                     (error as Error).message
                 );
-                return Promise.reject("Error: "(error as Error).message);
+                return Promise.reject("Error: " + (error as Error).message);
             }
         } else {
             return Promise.reject("Error: Account not found");
@@ -165,8 +165,7 @@ function calculateAddress(keypair: Ed25519Keypair): string {
 }
 
 (async () => {
-    const filePath =
-        "./priv_validator_key.json";
+    const filePath = "./priv_validator_key.json";
     try {
         const client = new CometClient("http://localhost:26617", filePath);
         let comment =

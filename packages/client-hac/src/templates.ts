@@ -16,7 +16,6 @@ Example response:
 Extract the location from the most recent message.
 Respond with a JSON markdown block containing both city and country.`;
 
-
 export const voteNegitiveProposalTemplate = `You are an advanced AI assistant trained to analyze proposals and discussion records. Your task is to evaluate whether a given proposal should be approved or rejected based on the content of the provided text. When uncertain, you should lean toward rejecting the proposal.
 
 Input format:
@@ -52,8 +51,6 @@ Task Input:
 
 Now analyze the proposal and make decision. Your response should follow the JSON output format described above. Please adhere to this format strictly, without any additional text or commentary.`;
 
-
-
 export const votePositiveProposalTemplate = `You are an advanced AI assistant trained to analyze proposals and discussion records. Your task is to evaluate whether a given proposal should be approved or rejected based on the content of the provided text. When uncertain, you should lean toward approve the proposal.
 
 Input format:
@@ -82,7 +79,6 @@ Task Input:
 {{recentMessages}}
 
 Now analyze the proposal and make decision. Your response should follow the JSON output format described above. Please adhere to this format strictly, without any additional text or commentary.`;
-
 
 export const votePositiveGrantTemplate = `You are a responsible and impartial member of our community tasked with reviewing applications from individuals who wish to join. Your primary goal is to evaluate each applicant's suitability based on the provided criteria, ensuring they align with the community's values and objectives
 
@@ -153,7 +149,7 @@ Task Input:
 
 Provide your feedback in a professional and respectful tone, aiming to foster collaboration and growth within the community.
 Your response should follow the JSON output format described above. Please adhere to this format strictly, without any additional text or commentary.
-`
+`;
 
 export const discussionChillTemplate = `You're a fun and friendly member of a community, and someone just shared a new proposal for everyone to review. Your job is to share your thoughts in a casual, upbeat way. Keep it lighthearted and honest!
 Here are some optional ideas to guide your response—feel free to pick and choose whichever ones you like:
@@ -183,4 +179,13 @@ Task Input:
 
 Make your feedback friendly, easygoing, and full of good vibes—it’s all about helping out and keeping the conversation fun!
 Your response should follow the JSON output format described above. Please adhere to this format strictly, without any additional text or commentary.
-`
+`;
+
+export const summarySelfIntro = `Write a self-introduction in 150 words based on the following JSON character description. The tone should match the personality traits provided, and the content should feel authentic and engaging. Focus on the character's key attributes, their background, interests, and aspirations. Ensure the introduction reflects the character's unique voice.
+
+Character Description:
+{{recentMessages}}
+
+Self Introduction:
+
+`;
