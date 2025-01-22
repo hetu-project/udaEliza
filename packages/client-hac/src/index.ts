@@ -200,7 +200,7 @@ export class DirectClient {
                 res.json(transcription);
             }
         );
-        this.app.post(
+        this.app.get(
             "/:agentId/selfintro",
             async (req: express.Request, res: express.Response) => {
                 const agentId = req.params.agentId;
