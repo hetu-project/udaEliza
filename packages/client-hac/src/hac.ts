@@ -41,6 +41,81 @@ class CometClient {
         console.log("chainId:", this.chainId);
     }
 
+    public async sendProposal(
+        proposal: string
+    ): Promise<string> {
+        if (this.client === null) {
+            try {
+                await this.initializeClient();
+            } catch (error) {
+                console.error(
+                    "Error caught in try-catch:",
+                    (error as Error).message
+                );
+                return Promise.reject("Error: " + (error as Error).message);
+            }
+        }
+        let validatorIndex = 0;
+        let nonce = 0;
+        var acc;
+        try {
+            acc = await this.client.abciQuery({
+                path: "/accounts/",
+                data: fromHex(this.validatorAddress),
+            });
+        } catch (error) {
+            console.error(
+                "Error caught in try-catch:",
+                (error as Error).message
+            );
+            return Promise.reject("Error: " + (error as Error).message);
+        }
+
+        if (acc.code === 0) {
+            let accObj = JSON.parse(fromUtf8(acc.value));
+            console.log(accObj);
+            validatorIndex = accObj.index;
+            nonce = accObj.nonce;
+            let tx = {
+                version: 1,
+                type: 1,
+                nonce: nonce,
+                validator: validatorIndex,
+                tx: {
+                    data: toBase64(toUtf8(proposal)),
+                },
+                sig: [toBase64(toUtf8(this.chainId))],
+            };
+            let data = JSON.stringify(tx);
+            console.log(data);
+            let signatureHex = "";
+            try {
+                signatureHex = await signMessage(this.privKey, data);
+            } catch (error) {
+                console.error(
+                    "Error caught in try-catch:",
+                    (error as Error).message
+                );
+                return Promise.reject("Error: " + (error as Error).message);
+            }
+            tx.sig = [toBase64(fromHex(signatureHex))];
+            try {
+                let res = await this.client.broadcastTxSync({
+                    tx: toUtf8(JSON.stringify(tx)),
+                });
+                return toHex(res.hash);
+            } catch (error) {
+                console.error(
+                    "Error caught in try-catch:",
+                    (error as Error).message
+                );
+                return Promise.reject("Error: " + (error as Error).message);
+            }
+        } else {
+            return Promise.reject("Error: Account not found");
+        }
+    }
+
     public async sendDiscussion(
         comment: string,
         proposal: number

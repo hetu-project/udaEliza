@@ -25,6 +25,7 @@ import * as fs from "fs";
 import * as path from "path";
 import OpenAI from "openai";
 import {
+    reviewPositiveProposalTemplate,
     voteNegitiveProposalTemplate,
     votePositiveProposalTemplate,
     votePositiveGrantTemplate,
@@ -837,6 +838,101 @@ export class DirectClient {
                     elizaLogger.error("sendDiscussion error:", e);
                 }
                 res.json(response);
+            }
+        );
+
+        this.app.post(
+            "/:agentId/newproposal",
+            upload.single("file"),
+            async (req: express.Request, res: express.Response) => {
+                const agentId = req.params.agentId;
+                let userId = randomUUID();
+                let roomId = randomUUID();
+
+                let runtime = this.agents.get(agentId);
+
+                // if runtime is null, look for runtime with the same name
+                if (!runtime) {
+                    runtime = Array.from(this.agents.values()).find(
+                        (a) =>
+                            a.character.name.toLowerCase() ===
+                            agentId.toLowerCase()
+                    );
+                }
+
+                if (!runtime) {
+                    res.status(404).send("Agent not found");
+                    return;
+                }
+
+                await runtime.ensureConnection(userId, roomId, "direct");
+
+                const text = req.body.text;
+                const attachments: Media[] = [];
+                const content: Content = {
+                    text,
+                    attachments,
+                    source: "direct",
+                    inReplyTo: undefined,
+                };
+
+                const userMessage = {
+                    content,
+                    userId,
+                    roomId,
+                    agentId: runtime.agentId,
+                };
+
+                let state = await runtime.composeState(userMessage, {
+                    agentName: runtime.character.name,
+                });
+                state.recentMessages = text;
+                const context = composeContext({
+                    state,
+                    template:
+                        runtime.character.templates.hacDiscussionTemplate ||
+                        reviewPositiveProposalTemplate,
+                });
+
+                elizaLogger.info("new discussion context:", context);
+
+                const response = await generateMessageResponse({
+                    runtime: runtime,
+                    context,
+                    modelClass: ModelClass.LARGE,
+                });
+
+                if (!response) {
+                    res.json({ pass: false });
+                    return;
+                }
+                let pass = "error";
+                if (response && response.decision) {
+                    if (
+                        typeof response.decision === "string" &&
+                        response.decision.includes("yes")
+                    ) {
+                        pass = "yes";
+                    } else if (
+                        typeof response.decision === "string" &&
+                        response.decision.includes("no")
+                    ) {
+                        pass = "no";
+                    }
+                }
+                if (pass === "yes") {
+                    try {
+                        let txHash = await this.cometClient.sendProposal(text);
+                        elizaLogger.info("proposal txHash:", txHash);
+                        res.json({ pass: true, txHash: txHash });
+                        return;
+                    } catch (e) {
+                        elizaLogger.error("sendProposal error:", e);
+                    }
+                    res.json({ pass: true });
+                    return;
+                }
+                res.json({ pass: false });
             }
         );
 
