@@ -214,3 +214,12 @@ Character Description:
 Self Introduction:
 
 `;
+
+export const summaryProposal = `You are tasked with summarizing a proposal into a concise and impactful title. Based on the content or description provided below, generate a title that encapsulates the key idea or focus of the proposal. The title must not exceed 10 words.
+
+Proposal:
+{{recentMessages}}
+
+Title:
+
+`
