@@ -31,6 +31,7 @@ import {
     votePositiveGrantTemplate,
     discussionChillTemplate,
     summarySelfIntro,
+    summaryProposal,
     discussionProfessionalTemplate,
 } from "./templates.ts";
 import { CometClient } from "./hac.ts";
@@ -201,6 +202,57 @@ export class DirectClient {
                 res.json(transcription);
             }
         );
+
+        this.app.post(
+            "/proposal_title",
+            async (req: express.Request, res: express.Response) => {
+                let runtime: AgentRuntime = this.agents.values().next().value;
+
+                if (!runtime) {
+                    res.status(404).send("Agent not found");
+                    return;
+                }
+                const userId = randomUUID();
+                const roomId = randomUUID();
+                await runtime.ensureConnection(userId, roomId);
+
+                const text = req.body.text;
+                const attachments: Media[] = [];
+                const content: Content = {
+                    text,
+                    attachments,
+                    source: "direct",
+                    inReplyTo: undefined,
+                };
+
+                const userMessage = {
+                    content,
+                    userId,
+                    roomId,
+                    agentId: runtime.agentId,
+                };
+
+                let state = await runtime.composeState(userMessage, {
+                    agentName: runtime.character.name,
+                });
+                state.recentMessages = text;
+                const context = composeContext({
+                    state,
+                    template: summaryProposal,
+                });
+
+                elizaLogger.info("new title context:", context);
+
+                const response = await generateText({
+                    runtime: runtime,
+                    context,
+                    modelClass: ModelClass.LARGE,
+                });
+                elizaLogger.info("title:", response);
+                res.json({ title: response });
+            }
+        );
+
         this.app.get(
             "/:agentId/selfintro",
             async (req: express.Request, res: express.Response) => {
