@@ -239,17 +239,17 @@ function calculateAddress(keypair: Ed25519Keypair): string {
     return toHex(address);
 }
 
-(async () => {
-    const filePath = "./priv_validator_key.json";
-    try {
-        const client = new CometClient("http://localhost:26617", filePath);
-        let comment =
-            '{"sentiment":"positive","feedback":"Wow, this proposal is super exciting! I love the direction you’re taking with decentralization – it really captures the spirit of Web3. The ideas feel fresh and innovative. Can’t wait to see how this evolves and contributes to the community. Keep it up! 1111';
-        const hash = await client.sendDiscussion(comment, 4);
-        console.log("tx hash:", hash);
-    } catch (error) {
-        console.error("Error:", error);
-    }
-})();
+// (async () => {
+//     const filePath = "./priv_validator_key.json";
+//     try {
+//         const client = new CometClient("http://localhost:26617", filePath);
+//         let comment =
+//             '{"sentiment":"positive","feedback":"Wow, this proposal is super exciting! I love the direction you’re taking with decentralization – it really captures the spirit of Web3. The ideas feel fresh and innovative. Can’t wait to see how this evolves and contributes to the community. Keep it up! 1111';
+//         const hash = await client.sendDiscussion(comment, 4);
+//         console.log("tx hash:", hash);
+//     } catch (error) {
+//         console.error("Error:", error);
+//     }
+// })();
 
 export { CometClient };
