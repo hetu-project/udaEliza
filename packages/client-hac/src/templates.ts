@@ -215,11 +215,17 @@ Self Introduction:
 
 `;
 
-export const summaryProposal = `You are tasked with summarizing a proposal into a concise and impactful title. Based on the content or description provided below, generate a title that encapsulates the key idea or focus of the proposal. The title must not exceed 10 words.
+export const summaryProposal = `You are tasked with summarizing a proposal into a concise and impactful title. Based on the content or description provided below, generate a title that encapsulates the key idea or focus of the proposal. The title must not exceed 10 words and should not contain any punctuation.
 
+Example:
+Proposal:
+In order to expand the company's market presence and increase sales, we propose the implementation of a comprehensive digital marketing strategy. With the shift towards online platforms, traditional marketing approaches have become less effective in reaching a broad audience. The proposed strategy will include social media campaigns, search engine optimization (SEO), email marketing, and paid advertisements. We aim to target a broader demographic, enhance brand visibility, and increase customer engagement across various digital platforms. The strategy will involve data-driven decision-making, utilizing analytics to track user behavior and adjust campaigns accordingly. The plan will be executed over six months, with the first phase focusing on building brand awareness through social media and SEO efforts, followed by a focused push with email marketing and paid ads. Success will be measured by increased website traffic, higher conversion rates, and improved social media engagement. The estimated budget for this project is $50,000, covering all aspects from content creation to ad spend. By leveraging the power of digital marketing, we believe the company can significantly boost its presence in the market and attract new customers, ultimately leading to increased revenue.
+Title:
+Boost Sales with Comprehensive Digital Marketing Strategy
+
+Task:
 Proposal:
 {{recentMessages}}
-
 Title:
 
 `
