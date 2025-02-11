@@ -217,6 +217,14 @@ export class DirectClient {
                 await runtime.ensureConnection(userId, roomId);
 
                 const text = req.body.text;
+                if (
+                    !text ||
+                    typeof text !== "string" ||
+                    text.trim().length === 0
+                ) {
+                    res.status(400).send("Invalid or empty text");
+                    return;
+                }
                 const attachments: Media[] = [];
                 const content: Content = {
                     text,
@@ -376,7 +384,14 @@ export class DirectClient {
                 }
 
                 const text = req.body.text;
-                //todo:format text
+                if (
+                    !text ||
+                    typeof text !== "string" ||
+                    text.trim().length === 0
+                ) {
+                    res.status(400).send("Invalid or empty text");
+                    return;
+                }
 
                 // if empty text, directly return
                 if (!text) {
@@ -463,11 +478,12 @@ export class DirectClient {
                 }
 
                 const text = req.body.text;
-                //todo:format text
-
-                // if empty text, directly return
-                if (!text) {
-                    res.status(400).send("No text provided");
+                if (
+                    !text ||
+                    typeof text !== "string" ||
+                    text.trim().length === 0
+                ) {
+                    res.status(400).send("Invalid or empty text");
                     return;
                 }
 
@@ -535,9 +551,12 @@ export class DirectClient {
                 );
 
                 const text = req.body.text;
-                // if empty text, directly return
-                if (!text) {
-                    res.json([]);
+                if (
+                    !text ||
+                    typeof text !== "string" ||
+                    text.trim().length === 0
+                ) {
+                    res.status(400).send("Invalid or empty text");
                     return;
                 }
 
@@ -714,6 +733,14 @@ export class DirectClient {
                 }
 
                 const text = req.body.text;
+                if (
+                    !text ||
+                    typeof text !== "string" ||
+                    text.trim().length === 0
+                ) {
+                    res.status(400).send("Invalid or empty text");
+                    return;
+                }
 
                 const attachments: Media[] = [];
 
@@ -827,6 +854,14 @@ export class DirectClient {
                 }
 
                 const text = req.body.text;
+                if (
+                    !text ||
+                    typeof text !== "string" ||
+                    text.trim().length === 0
+                ) {
+                    res.status(400).send("Invalid or empty text");
+                    return;
+                }
 
                 const attachments: Media[] = [];
                 if (req.file) {
@@ -920,6 +955,14 @@ export class DirectClient {
                 await runtime.ensureConnection(userId, roomId, "direct");
 
                 const text = req.body.text;
+                if (
+                    !text ||
+                    typeof text !== "string" ||
+                    text.trim().length === 0
+                ) {
+                    res.status(400).send("Invalid or empty text");
+                    return;
+                }
                 const attachments: Media[] = [];
                 const content: Content = {
                     text,
@@ -1031,6 +1074,14 @@ export class DirectClient {
                 );
 
                 const text = req.body.text;
+                if (
+                    !text ||
+                    typeof text !== "string" ||
+                    text.trim().length === 0
+                ) {
+                    res.status(400).send("Invalid or empty text");
+                    return;
+                }
                 const attachments: Media[] = [];
 
                 const content: Content = {
