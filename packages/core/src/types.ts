@@ -718,6 +718,9 @@ export type Character = {
     /** Optional model endpoint override */
     modelEndpointOverride?: string;
 
+    /** Optional Agent HeadPhoto Url */
+    headPhotoUrl?: string;
+
     /** Optional prompt templates */
     templates?: {
         goalsTemplate?: TemplateType;
