@@ -333,6 +333,39 @@ export class DirectClient {
                 res.json({ character: this.character });
             }
         );
+
+        this.app.get(
+            "/:agentId/headphoto",
+            async (req: express.Request, res: express.Response) => {
+                const agentId = req.params.agentId;
+                if (this.character && this.character.length > 0) {
+                    res.json({ character: this.character });
+                    return;
+                }
+                let runtime = this.agents.get(agentId);
+
+                // if runtime is null, look for runtime with the same name
+                if (!runtime) {
+                    runtime = Array.from(this.agents.values()).find(
+                        (a) =>
+                            a.character.name.toLowerCase() ===
+                            agentId.toLowerCase()
+                    );
+                }
+
+                if (!runtime) {
+                    res.status(404).send("");
+                    return;
+                }
+
+                if (runtime.character.headPhotoUrl) {
+                    res.send(runtime.character.headPhotoUrl);
+                } else {
+                    res.status(404).send("");
+                }
+            }
+        );
+
         this.app.post(
             "/:agentId/proposal",
             async (req: express.Request, res: express.Response) => {
