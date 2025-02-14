@@ -255,7 +255,7 @@ export class DirectClient {
                     const response = await generateText({
                         runtime: runtime,
                         context,
-                        modelClass: ModelClass.MEDIUM,
+                        modelClass: ModelClass.SMALL,
                     });
                     elizaLogger.info("title:", response);
                     res.json({ title: response });
@@ -331,7 +331,7 @@ export class DirectClient {
                     const response = await generateText({
                         runtime: runtime,
                         context,
-                        modelClass: ModelClass.MEDIUM,
+                        modelClass: ModelClass.SMALL,
                     });
                     elizaLogger.info("response:", response);
                     this.character = response;
@@ -662,7 +662,7 @@ export class DirectClient {
                 const response = await generateMessageResponse({
                     runtime: runtime,
                     context,
-                    modelClass: ModelClass.MEDIUM,
+                    modelClass: ModelClass.SMALL,
                 });
 
                 if (!response) {
@@ -816,7 +816,7 @@ export class DirectClient {
                 const response = await generateMessageResponse({
                     runtime: runtime,
                     context,
-                    modelClass: ModelClass.MEDIUM,
+                    modelClass: ModelClass.SMALL,
                 });
 
                 let vote = "no";
@@ -952,7 +952,7 @@ export class DirectClient {
                 const response = await generateMessageResponse({
                     runtime: runtime,
                     context,
-                    modelClass: ModelClass.MEDIUM,
+                    modelClass: ModelClass.SMALL,
                 });
                 if (!response) {
                     res.status(500).send("");
@@ -1038,7 +1038,7 @@ export class DirectClient {
                 const response = await generateMessageResponse({
                     runtime: runtime,
                     context,
-                    modelClass: ModelClass.MEDIUM,
+                    modelClass: ModelClass.SMALL,
                 });
 
                 if (!response) {
@@ -1171,7 +1171,7 @@ export class DirectClient {
                 const response = await generateMessageResponse({
                     runtime: runtime,
                     context,
-                    modelClass: ModelClass.MEDIUM,
+                    modelClass: ModelClass.SMALL,
                 });
                 let vote = "no";
                 if (!response) {
