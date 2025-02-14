@@ -1,5 +1,6 @@
 {
     "name": "Alice",
+    "headPhotoUrl":"http://52.221.224.189/images/alice.png",
     "plugins": [],
     "clients": [],
     "modelProvider": "openai",
