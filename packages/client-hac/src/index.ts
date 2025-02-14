@@ -251,13 +251,18 @@ export class DirectClient {
 
                 elizaLogger.info("new title context:", context);
 
-                const response = await generateText({
-                    runtime: runtime,
-                    context,
-                    modelClass: ModelClass.LARGE,
-                });
-                elizaLogger.info("title:", response);
-                res.json({ title: response });
+                try {
+                    const response = await generateText({
+                        runtime: runtime,
+                        context,
+                        modelClass: ModelClass.LARGE,
+                    });
+                    elizaLogger.info("title:", response);
+                    res.json({ title: response });
+                } catch (error) {
+                    elizaLogger.error("Error generating text:", error);
+                    res.status(500).send("");
+                }
             }
         );
 
@@ -322,15 +327,19 @@ export class DirectClient {
                 });
 
                 elizaLogger.info("new selfintro context:", context);
-
-                const response = await generateText({
-                    runtime: runtime,
-                    context,
-                    modelClass: ModelClass.LARGE,
-                });
-                elizaLogger.info("response:", response);
-                this.character = response;
-                res.json({ character: this.character });
+                try {
+                    const response = await generateText({
+                        runtime: runtime,
+                        context,
+                        modelClass: ModelClass.LARGE,
+                    });
+                    elizaLogger.info("response:", response);
+                    this.character = response;
+                    res.json({ character: this.character });
+                } catch (error) {
+                    elizaLogger.error("Error generating text:", error);
+                    res.status(500).send("");
+                }
             }
         );
 
@@ -809,15 +818,13 @@ export class DirectClient {
                     context,
                     modelClass: ModelClass.LARGE,
                 });
-                elizaLogger.info("response:", response);
 
+                let vote = "no";
                 if (!response) {
-                    res.status(500).send(
-                        "No response from generateMessageResponse"
-                    );
+                    res.json({ vote });
                     return;
                 }
-                let vote = "error";
+
                 if (response && response.decision) {
                     if (
                         typeof response.decision === "string" &&
@@ -947,6 +954,10 @@ export class DirectClient {
                     context,
                     modelClass: ModelClass.LARGE,
                 });
+                if (!response) {
+                    res.status(500).send("");
+                    return;
+                }
                 try {
                     let txHash = await this.cometClient.sendDiscussion(
                         String(response.feedback),
@@ -1162,15 +1173,12 @@ export class DirectClient {
                     context,
                     modelClass: ModelClass.LARGE,
                 });
-                elizaLogger.info("response:", response);
-
+                let vote = "no";
                 if (!response) {
-                    res.status(500).send(
-                        "No response from generateMessageResponse"
-                    );
+                    res.json({ vote });
                     return;
                 }
-                let vote = "error";
+
                 if (response && response.decision) {
                     if (
                         typeof response.decision === "string" &&
