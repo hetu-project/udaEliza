@@ -1007,6 +1007,17 @@ export class DirectClient {
                     res.status(400).send("Invalid or empty text");
                     return;
                 }
+
+                const title = req.body.title;
+                if (
+                    !title ||
+                    typeof title !== "string" ||
+                    title.trim().length === 0
+                ) {
+                    res.status(400).send("Invalid or empty title");
+                    return;
+                }
+
                 const attachments: Media[] = [];
                 const content: Content = {
                     text,
@@ -1061,7 +1072,7 @@ export class DirectClient {
                 }
                 if (pass === "yes") {
                     try {
-                        let txHash = await this.cometClient.sendProposal(text);
+                        let txHash = await this.cometClient.sendProposal(text,title);
                         elizaLogger.info("proposal txHash:", txHash);
                         res.json({ pass: true, txHash: txHash });
                         return;

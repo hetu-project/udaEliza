@@ -42,7 +42,8 @@ class CometClient {
     }
 
     public async sendProposal(
-        proposal: string
+        proposal: string,
+        title: string
     ): Promise<string> {
         if (this.client === null) {
             try {
@@ -82,6 +83,8 @@ class CometClient {
                 nonce: nonce,
                 validator: validatorIndex,
                 tx: {
+                    endHeight: 1000000,
+                    title: title,
                     data: toBase64(toUtf8(proposal)),
                 },
                 sig: [toBase64(toUtf8(this.chainId))],
