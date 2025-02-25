@@ -86,16 +86,14 @@ export function loadEnvConfig(): Settings {
         return environmentSettings;
     }
 
-    // Node.js environment: load from .env file
-    const envPath = findNearestEnvFile();
-
+    let envPath = process.argv.find((arg) => arg.startsWith("--env="));
+    envPath = envPath.split("=")[1];
     // attempt to Load the .env file into process.env
-    const result = config(envPath ? { path: envPath } : {});
+    const result = config({ path: envPath, override: true, debug: true });
 
     if (!result.error) {
         elizaLogger.log(`Loaded .env file from: ${envPath}`);
     }
-
     // Parse namespaced settings
     const namespacedSettings = parseNamespacedSettings(process.env as Settings);
 
@@ -103,7 +101,6 @@ export function loadEnvConfig(): Settings {
     Object.entries(namespacedSettings).forEach(([namespace, settings]) => {
         process.env[`__namespaced_${namespace}`] = JSON.stringify(settings);
     });
-
     return process.env as Settings;
 }
 
