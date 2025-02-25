@@ -1040,7 +1040,7 @@ export class DirectClient {
                 const context = composeContext({
                     state,
                     template:
-                        runtime.character.templates.hacDiscussionTemplate ||
+                        runtime.character.templates.hacVoteProposalTemplate ||
                         reviewPositiveProposalTemplate,
                 });
 
