@@ -85,6 +85,8 @@ class CometClient {
                 tx: {
                     endHeight: 1000000,
                     title: title,
+                    imageUrl: "",
+                    link: "",
                     data: toBase64(toUtf8(proposal)),
                 },
                 sig: [toBase64(toUtf8(this.chainId))],
